@@ -23,7 +23,7 @@ export default function Register() {
   return (
     <>
       <title>
-        Millenium LMS by GNF Labs
+        Register
       </title>
       <main className="flex h-screen flex-col p-4">
         <div className="parallax-bg" />
