@@ -24,7 +24,7 @@ interface NavigationBarProps {
  * Renders a navigation bar with a logo and menu items.
  * 
  * @param props - The props for the NavigationBar component
- * @param props.logoSource - The filename of the logo image in the public folder
+ * @param props.logo - The logo configuration
  * @param props.navigationMenu - An array of objects representing the navigation menu items
  * @returns A React component representing the navigation bar
  */
@@ -37,7 +37,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu }) =
       <div className='flex items-center flex-row lg:space-x-16 sm:space-x-4'>
         {navigationMenu.map((item, index)=> (
           <Link key={index} href={item.route}>
-            <p className='font-bold lg:text-[24px] sm:text-sm'>{item.name}</p>
+            <p className='font-bold lg:text-[20px] sm:text-sm'>{item.name}</p>
           </Link>
         ))}
       </div>

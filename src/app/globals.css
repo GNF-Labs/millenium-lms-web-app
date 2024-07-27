@@ -22,13 +22,17 @@ html {
 
 h1 {
   color: black;
-  font-weight: bold;
+  font-weight: bolder;
   font-size: 48px;
 }
 
 h2 {
   color: black;
   font-size: 28px;
+}
+
+p {
+  color: black;
 }
 
 body {

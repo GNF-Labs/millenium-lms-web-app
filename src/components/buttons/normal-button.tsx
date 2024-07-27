@@ -14,7 +14,7 @@ interface NormalButtonProps {
 const NormalButton1: React.FC<NormalButtonProps> = ({ text, onClick }) => {
     return (
         <button
-            className="bg-white text-[#294149] text-[24px] min-w-[220px] font-bold px-8 py-4 rounded-[15px] border border-[#294149] hover:bg-gray-100 transition-colors"
+            className="bg-white text-[#294149] text-[16px] min-w-[150px] font-bold px-8 py-4 rounded-[15px] border border-[#294149] hover:bg-gray-100 transition-colors"
             onClick={onClick}
         >
             {text}
@@ -25,7 +25,7 @@ const NormalButton1: React.FC<NormalButtonProps> = ({ text, onClick }) => {
 const NormalButton2: React.FC<NormalButtonProps> = ({ text, onClick }) => {
     return (
         <button
-            className="bg-[#294149] min-w-[220px] text-[24px] font-bold text-white px-8 py-4 rounded-[15px] hover:bg-[#3a5865] transition-colors"
+            className="bg-[#294149] min-w-[150px] text-[16px] font-bold text-white px-8 py-4 rounded-[15px] hover:bg-[#3a5865] transition-colors"
             onClick={onClick}
         >
             {text}
