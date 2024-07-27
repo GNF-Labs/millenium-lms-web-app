@@ -31,6 +31,10 @@ h2 {
   font-size: 28px;
 }
 
+input {
+  color: black;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
