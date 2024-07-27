@@ -8,10 +8,10 @@ import LoginBox from "@/components/loginbox/loginbox";
 import { NormalButton1, NormalButton2 } from "@/components/buttons/normal-button";
 
 /**
- * Login Screen
+ * Register Screen
  * @returns
  */
-export default function Login() {
+export default function Register() {
   const navigationRoute = [
     { name: "Home", route: "/" },
     { name: "Dashboard", route: "/dashboard" },
