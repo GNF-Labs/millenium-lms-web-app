@@ -35,6 +35,10 @@ p {
   color: black;
 }
 
+input {
+  color: black;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(

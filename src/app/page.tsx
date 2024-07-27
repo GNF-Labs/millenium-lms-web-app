@@ -1,14 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import { Poppins } from "next/font/google";
 import { poppins } from "./fonts";
 import NavigationBar from "@/components/navbar/navigation-bar";
 import { NormalButton1, NormalButton2 } from "@/components/buttons/normal-button";
+import { useRouter } from "next/navigation";
 
 /**
  * Home Screen (For landing page)
  * @returns
  */
 export default function Home() {
+  const router = useRouter();
   const navigationRoute = [
     { name: "Home", route: "/" },
     { name: "Dashboard", route: "/dashboard" },
@@ -16,6 +20,13 @@ export default function Home() {
     { name: "Informations", route: "/informations" },
     { name: "Profile", route: "/profile" },
   ];
+
+  function GoToRegister() {
+    router.push("/register");
+  }
+  function GoToLogin() {
+    router.push("/login");
+  }
 
   return (
     <>
@@ -40,8 +51,8 @@ export default function Home() {
           </div>
           <div className="md:h-16"/>
           <div className="flex flex-row space-x-4">
-            <NormalButton2 text="Register"/>
-            <NormalButton1 text="Log In"/>
+            <NormalButton2 text="Register" onClick={GoToRegister}/>
+            <NormalButton1 text="Log In" onClick={GoToLogin}/>
           </div>
         </div>
 
