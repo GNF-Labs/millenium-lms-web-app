@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 import { ImportantButton } from '../buttons/important-button';
+import { FaClock, FaStar } from 'react-icons/fa';
 
 interface CourseCardProps {
     /**
@@ -39,7 +40,7 @@ interface CourseCardProps {
 const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorName, timeEstimated, rating }) => {
     const router = useRouter();
     const handleButtonClick = (url: any) => {
-        return url;   
+        return url;
     }
     return (
         <div className='flex flex-row justify-between items-center background1 py-4 px-8'>
@@ -51,14 +52,18 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorNam
                 </div>
             </div>
             <div className='flex flex-row space-x-4'>
-                <p>
-                    {timeEstimated}
+                <p className='flex items-center whitespace-nowrap'>
+                    <span><FaClock /></span> &nbsp;&nbsp;{timeEstimated}
                 </p>
-                <p>
+                <p className='flex items-center whitespace-nowrap'>
+                    <span>
+                        <FaStar />
+                    </span>
+                    &nbsp;&nbsp;
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='View' onClick={handleButtonClick(`courses/${id}`)}/>
+            <ImportantButton text='View' onClick={handleButtonClick(`courses/${id}`)} />
 
         </div>
     )
@@ -66,7 +71,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorNam
 
 const DashboardCoursesMenu = () => {
 
-    const coursesList: {id:number, src: string, name: string, authorName: string, timeEstimated: string, rating: number }[] = [
+    const coursesList: { id: number, src: string, name: string, authorName: string, timeEstimated: string, rating: number }[] = [
         {
             id: 1,
             src: "images/logos/javascript.svg",
