@@ -64,7 +64,7 @@ const LoginBox: React.FC<LoginBoxProps> = ({isLogin}) => {
   };
 
   return (
-      <div className="backdrop-blur-xl bg-white/60 p-8 rounded-3xl shadow-md max-w-sm w-full mx-auto mt-10">
+      <div className="backdrop-blur-md bg-[rgba(255,254,254,0.73)] p-8 rounded-3xl shadow-md max-w-sm w-full mx-auto mt-10">
         <form onSubmit={handleSubmit}>
         {/* {!domLoaded ? null : */}
             <div className="flex flex-col space-y-10">
