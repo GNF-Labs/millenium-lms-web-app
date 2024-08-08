@@ -25,10 +25,13 @@ export default function Register() {
       <title>
         Register
       </title>
+      <NavigationBar logo={{ source: "images/logo_GNF.png", width: 90, height: 90 }} navigationMenu={navigationRoute} />
       <main className="flex h-screen flex-col p-4">
         <div className="parallax-bg" />
-        <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
-        <LoginBox isLogin={false}/>
+        <div className="flex justify-center items-center min-h-screen w-full mt-12 pb-12">
+
+          <LoginBox isLogin={false} />
+        </div>
       </main>
     </>
 

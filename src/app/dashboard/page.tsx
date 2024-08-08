@@ -1,3 +1,5 @@
+'use client'
+
 import NavigationBar from '@/components/navbar/navigation-bar'
 import React from 'react'
 import { navigationRoute } from '../constants'

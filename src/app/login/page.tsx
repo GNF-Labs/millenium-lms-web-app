@@ -25,10 +25,13 @@ export default function Login() {
       <title>
         Login
       </title>
+        <NavigationBar logo={{ source: "images/logo_GNF.png", width: 90, height: 90 }}/>
       <main className="flex h-screen flex-col p-4">
         <div className="parallax-bg" />
-        <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
-        <LoginBox isLogin={true}/>
+        <div className="flex justify-center items-center min-h-screen w-full">
+
+          <LoginBox isLogin={true} />
+        </div>
       </main>
     </>
 

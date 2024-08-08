@@ -1,12 +1,13 @@
 'use client'
 
 import NavigationBar from '@/components/navbar/navigation-bar'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { navigationRoute } from '../constants'
 import Image from 'next/image'
 import Head from 'next/head'
 import { CourseCard } from '@/components/menus/dashboard-courses-menu'
 import { ImportantButton, ImportantButton2 } from '@/components/buttons/important-button'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 
 const ProfilePage = () => {
     const coursesList: { id: number, src: string, name: string, authorName: string, timeEstimated: string, rating: number }[] = [
@@ -36,14 +37,17 @@ const ProfilePage = () => {
         },
     ];
 
+    const dispatch = useAppDispatch();
+    const tokenSelector = useAppSelector((state)=>state.jwt)
+    useEffect(()=> {
+        
+    })
+
     return (
         <>
-            <Head>
-
-                <title>
-                    Profile
-                </title>
-            </Head>
+            <title>
+                Profile
+            </title>
             <NavigationBar logo={{ source: "images/logo_GNF.png", width: 90, height: 90 }} navigationMenu={navigationRoute} />
             <div className="flex min-h-screen flex-col p-4">
 
@@ -58,7 +62,7 @@ const ProfilePage = () => {
                             <div className='space-y-2'>
                                 <h2>Takanashi Hoshino</h2>
                                 <h2>@pamanhoshino</h2>
-                                <div className='h-1'/>
+                                <div className='h-1' />
                                 <p>
                                     Atsui<br />
                                     Atsukute Hikarabisou<br />
@@ -74,7 +78,7 @@ const ProfilePage = () => {
                         </div>
                         <div className='w-[7.5%]' />
                         <div className='w-[90%] pt-4'>
-                            <h1>Latest Courses</h1>
+                            <h1>Kursus Terkini</h1>
                             <div className='h-4' />
                             <div className='flex flex-col space-y-4'>
                                 {coursesList.map((item, index) => (

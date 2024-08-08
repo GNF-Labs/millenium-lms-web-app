@@ -6,6 +6,8 @@ import { poppins } from "./fonts";
 import NavigationBar from "@/components/navbar/navigation-bar";
 import { NormalButton1, NormalButton2 } from "@/components/buttons/normal-button";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 /**
  * Home Screen (For landing page)
@@ -27,6 +29,10 @@ export default function Home() {
   function GoToLogin() {
     router.push("/login");
   }
+
+  
+  const dispatch = useAppDispatch();
+  const tokenSelector = useAppSelector((state)=>state.jwt)
 
   return (
     <>
