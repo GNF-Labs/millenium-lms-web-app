@@ -75,9 +75,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
   const dispatch = useAppDispatch();
   const tokenSelector = useAppSelector((state) => state.jwt)
 
-  useEffect(()=> {
-    console.log(tokenSelector)
-  })
+  useEffect(() => {
+    console.log('Token changed:', tokenSelector);
+  }, [tokenSelector])
   const handleProfileClick = async (e: React.MouseEvent) => {
     if (!tokenSelector.token) {
       router.push("/login");
@@ -86,12 +86,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
 
     try {
       const uri = API_URI;
-      const response = await fetch(`${uri}/verify-token`, {
+      const response = await fetch(`${uri}/verify-token/${tokenSelector.username}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${tokenSelector.token}`
-        }
+        },
       });
 
       if (response.status === 401 || response.status === 403) {

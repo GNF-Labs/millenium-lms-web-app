@@ -7,6 +7,7 @@ interface TokenState {
     token: string | null;
 }
 
+
 const initialState: TokenState = {
     username: "guest",
     token: null
@@ -19,9 +20,13 @@ export const tokenSlice = createSlice({
         saveToken: (state, action)=> {
             state.token = action.payload.token;
             state.username = action.payload.username;
+            localStorage.setItem('username', state.username);
+            localStorage.setItem('token', state.token || '');
         },
         deleteToken: (state, action)=> {
             state = initialState;
+            localStorage.removeItem('username');
+            localStorage.removeItem('token');
         }
     }
 })

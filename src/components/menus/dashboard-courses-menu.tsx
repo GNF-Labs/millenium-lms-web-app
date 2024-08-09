@@ -40,7 +40,7 @@ interface CourseCardProps {
 export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorName, timeEstimated, rating }) => {
     const router = useRouter();
     const handleButtonClick = (url: any) => {
-        return url;
+        console.log(url)
     }
     return (
         <div className='flex flex-row justify-between items-center background1 py-4 px-8'>
@@ -63,7 +63,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='Lihat' onClick={handleButtonClick(`courses/${id}`)} />
+            <ImportantButton text='Lihat' onClick={()=>{console.log("masa ini error sih?")}} />
 
         </div>
     )

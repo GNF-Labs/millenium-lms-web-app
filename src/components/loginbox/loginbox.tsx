@@ -3,7 +3,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { API_URI } from '@/app/constants';
-import { useAppDispatch } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { saveToken } from '@/redux/slices/tokenSlice';
 
 interface LoginBoxProps {
@@ -26,10 +26,12 @@ const LoginBox: React.FC<LoginBoxProps> = ({ isLogin }) => {
     const login = isLogin;
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const tokenSelector = useAppSelector((state)=>state.jwt);
 
     useEffect(() => {
+        console.log([tokenSelector.token, tokenSelector.username])
         setDomLoaded(true);
-    }, []);
+    }, [tokenSelector.token, tokenSelector.username]);
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
@@ -91,7 +93,7 @@ const LoginBox: React.FC<LoginBoxProps> = ({ isLogin }) => {
                     console.error('Login failed:', response.statusText)
             } else {
                 // logic register
-                formData.append('name', name);
+                formData.append('username', name);
                 formData.append('full_name', fullName);
                 formData.append('email', email);
                 formData.append('password', password);
