@@ -6,4 +6,6 @@ const navigationRoute = [
     { name: "Profile", route: "/profile" },
   ];
 
-export {navigationRoute}
+
+const API_URI = process.env.NEXT_PUBLIC_DEV_API_URI;
+export {navigationRoute, API_URI}
