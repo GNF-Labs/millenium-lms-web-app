@@ -33,9 +33,10 @@ export default function Home() {
       <title>
         Millenium LMS by GNF Labs
       </title>
+      <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
       <main className="flex h-screen flex-col p-4">
         <div className="parallax-bg" />
-        <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
+        
         <div className="flex flex-col justify-center h-full pl-12">
 
           <div className="flex flex-col justify-self-center space-y-2 max-w-[55%]">

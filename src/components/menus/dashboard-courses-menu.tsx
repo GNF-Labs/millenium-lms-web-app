@@ -37,7 +37,7 @@ interface CourseCardProps {
     rating: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorName, timeEstimated, rating }) => {
+export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorName, timeEstimated, rating }) => {
     const router = useRouter();
     const handleButtonClick = (url: any) => {
         return url;
@@ -63,13 +63,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorNam
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='View' onClick={handleButtonClick(`courses/${id}`)} />
+            <ImportantButton text='Lihat' onClick={handleButtonClick(`courses/${id}`)} />
 
         </div>
     )
 }
 
-const DashboardCoursesMenu = () => {
+export const DashboardCoursesMenu = () => {
 
     const coursesList: { id: number, src: string, name: string, authorName: string, timeEstimated: string, rating: number }[] = [
         {
@@ -105,16 +105,10 @@ const DashboardCoursesMenu = () => {
             </h1>
             <div className='flex flex-row space-x-8'>
                 <button>
-                    <p className='font-bold hover:bg-gray-50/30'>All Courses</p>
+                    <p className='font-bold hover:bg-gray-50/30'>Rekomendasi</p>
                 </button>
                 <button>
-                    <p className='font-bold hover:bg-gray-50/30'>Newest</p>
-                </button>
-                <button>
-                    <p className='font-bold hover:bg-gray-50/30'>Top Rated</p>
-                </button>
-                <button>
-                    <p className='font-bold hover:bg-gray-50/30'>Recommendation</p>
+                    <p className='font-bold hover:bg-gray-50/30'>Terbaru</p>
                 </button>
             </div>
             <div className='flex flex-col space-y-4'>
@@ -126,4 +120,3 @@ const DashboardCoursesMenu = () => {
     )
 }
 
-export default DashboardCoursesMenu
