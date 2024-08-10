@@ -6,6 +6,7 @@ import React, { useReducer } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { initialState, reducer } from "./reducer";
+import { handleRegister } from "@/services/handlers";
 
 /**
  * Register Screen
@@ -15,10 +16,34 @@ export default function Register() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if(!state.passwordConditionFullfiled || !state.samePasswordConfirmed){return;}
     // Handle form submission
+    const formData = new FormData();
+    formData.append("username", state.username);
+    formData.append("full_name", state.name);
+    formData.append("email", state.email);
+    formData.append("password", state.password);
+
+    try {
+
+      const {status, data} = await handleRegister(formData);
+      
+      if (status !== 201 && status !== 200) {
+        console.log(data);
+        
+        return;
+      }
+      router.push("/login");
+      console.error(`${status}: ${data}`)
+    } catch (e) {
+      console.error(e);
+    }
+
+
     console.log(state);
   }
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {dispatch({type: 'SET_NAME', payload: e.target.value})};

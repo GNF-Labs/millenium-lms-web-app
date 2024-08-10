@@ -19,9 +19,12 @@ export const initMega = async () => {
     
 }
 
-export const readImage = async (megaUrl: string): Promise<string | null> => {
+export const readImage = async (url: string): Promise<string | null> => {
     try {
-        const file = await File.fromURL(megaUrl).loadAttributes();
+        if (!url.startsWith("https://mega.nz")) {
+            return url;
+        }
+        const file = await File.fromURL(url).loadAttributes();
         const buffer = await file.downloadBuffer({});
         
         // Determine the file type from the MIME type (assuming the file has a MIME type attribute)

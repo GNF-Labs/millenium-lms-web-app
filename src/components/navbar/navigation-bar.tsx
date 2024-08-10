@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { redirect, useRouter } from 'next/navigation'
 import { API_URI } from '@/app/constants'
+import store from '@/redux/store'
+import { getToken } from '@/redux/slices/tokenSlice'
 
 interface NavigationBarProps {
   /**
@@ -41,14 +43,14 @@ const navigationRoute = [
 ];
 
 interface TheLinkProps {
-  name:string;
-  route:string;
-  style?:React.CSSProperties;
-  onClick?: (e:any)=>any
+  name: string;
+  route: string;
+  style?: React.CSSProperties;
+  onClick?: (e: any) => any
 }
 
 
-const TheLink: FC<TheLinkProps> = ({name, route, style, onClick}) => {
+const TheLink: FC<TheLinkProps> = ({ name, route, style, onClick }) => {
   const router = useRouter();
 
   const handleClick = (e: React.MouseEvent) => {
@@ -76,8 +78,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
   const tokenSelector = useAppSelector((state) => state.jwt)
 
   useEffect(() => {
-    console.log('Token changed:', tokenSelector);
-  }, [tokenSelector])
+    // Function to be called on state change
+    const handleStateChange = () => {
+      const state = getToken(store.getState());
+      console.log('Token changed:', state); // Log the updated jwt state
+    };
+
+    // Subscribe to the store
+    const unsubscribe = store.subscribe(handleStateChange);
+
+    // Unsubscribe when the component is unmounted
+    return () => {
+      unsubscribe();
+    };
+  }, []);
   const handleProfileClick = async (e: React.MouseEvent) => {
     if (!tokenSelector.token) {
       router.push("/login");
@@ -112,11 +126,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
         <Image src={`/${logo.source}`} alt="Logo" width={logo.width} height={logo.height} />
       </div>
       <div className='flex items-center flex-row lg:space-x-16 sm:space-x-4'>
-        <TheLink name='Home' route='/'/>
-        <TheLink name='Dashboard' route='/dashboard'/>
-        <TheLink name='Courses' route='/courses'/>
-        <TheLink name='Informations' route='/informations'/>
-        <TheLink name='Profile' route={`/profile/${tokenSelector.username}`} onClick={handleProfileClick}/>
+        <TheLink name='Home' route='/' />
+        <TheLink name='Dashboard' route='/dashboard' />
+        <TheLink name='Courses' route='/courses' />
+        <TheLink name='Informations' route='/informations' />
+        <TheLink name='Profile' route={`/profile/${tokenSelector.username}`} onClick={handleProfileClick} />
       </div>
     </div>
   )

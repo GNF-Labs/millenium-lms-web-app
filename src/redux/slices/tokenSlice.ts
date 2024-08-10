@@ -23,10 +23,11 @@ export const tokenSlice = createSlice({
             localStorage.setItem('username', state.username);
             localStorage.setItem('token', state.token || '');
         },
-        deleteToken: (state, action)=> {
-            state = initialState;
+        deleteToken: (state)=> {
             localStorage.removeItem('username');
             localStorage.removeItem('token');
+            state.username = 'guest';
+            state.token = null;
         }
     }
 })

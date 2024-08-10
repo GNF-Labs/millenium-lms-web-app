@@ -8,7 +8,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import store from "@/redux/store";
 import ClientSideInitializer from "@/services/init";
 
-const inter = Inter({ subsets: ["latin"] });  
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -18,8 +18,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <ReduxProvider store={store}>
-      <ClientSideInitializer />
-        
+        <ClientSideInitializer />
         <body className={poppins.className}>{children}</body>
       </ReduxProvider>
     </html>

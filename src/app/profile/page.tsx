@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { fetchProfile } from '@/services/handlers'
 import { useRouter } from 'next/navigation'
 import { readImage } from '@/services/mega'
+import { deleteToken } from '@/redux/slices/tokenSlice'
 
 // Define the initial state and action types for the reducer
 interface ProfileState {
@@ -76,10 +77,15 @@ const ProfilePage = () => {
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState<boolean>(true);
 
+
     const dispatch = useAppDispatch();
     const tokenSelector = useAppSelector((state) => state.jwt)
     const router = useRouter();
 
+    const handleLogout = () => {
+        dispatch(deleteToken());
+        router.push("/");
+    }
     useEffect(() => {
         const req = async () => {
             profileDispatch({ type: 'FETCH_INIT' });
@@ -92,11 +98,10 @@ const ProfilePage = () => {
                 }
                 profileDispatch({ type: 'FETCH_SUCCESS', payload: data });
 
-                if (data.image_url) {
-                    const imageUrl = await readImage(data.image_url);
-                    setProfileImage(imageUrl);
-                    setImageLoading(false);
-                }
+                const imageUrl = await readImage(data.image_url);
+
+                setProfileImage(imageUrl);
+                setImageLoading(false);
             } catch (error) {
                 profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
             }
@@ -132,11 +137,11 @@ const ProfilePage = () => {
                                 )}
                             </div>
                             <div className='space-y-2'>
-                                <h2>{profileState.profile?.full_name}</h2>
-                                <h2>@{profileState.profile?.username}</h2>
+                                <h2 className='font-bold'>{profileState.profile?.full_name}</h2>
+                                <h2 className='text-base'>@{profileState.profile?.username}</h2>
                                 <div className='h-1' />
                                 <p>
-                                    {profileState.profile?.about}
+                                    {profileState.profile?.about || "No Description"}
                                 </p>
 
                             </div>
@@ -144,7 +149,7 @@ const ProfilePage = () => {
                                 <p className='text-[#eee]'>Edit Profile</p>
                             </button> */}
                             <ImportantButton2 text={'Sunting Profil'} />
-                            <ImportantButton2 text={'Log Keluar'} />
+                            <ImportantButton2 text={'Log Keluar'} onClick={handleLogout} />
                         </div>
                         <div className='w-[7.5%]' />
                         <div className='w-[90%] pt-4'>
