@@ -3,11 +3,13 @@
 import Image from "next/image";
 import { Poppins } from "next/font/google";
 import { poppins } from "../fonts";
+import { navigationRoute } from "../constants";
 import NavigationBar from "@/components/navbar/navigation-bar";
-import { NormalButton1, NormalButton2 } from "@/components/buttons/normal-button";
+import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { CourseCard } from "@/components/cards/course-card";
-import { useRouter } from "next/navigation";
-import { useRef } from 'react';
+import { CardCarousel } from "@/components/cards/card-carousel";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 /**
  * Courses Screen
@@ -15,50 +17,27 @@ import { useRef } from 'react';
  */
 export default function Courses() {
   const router = useRouter();
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: -carouselRef.current.clientWidth, behavior: 'smooth' });
-    }
-  };
-  const scrollRight = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: carouselRef.current.clientWidth, behavior: 'smooth' });
-    }
-  };
+  const [search, setSearch] = useState("");
+  const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(search === "") {return;}
+    const searchParams = new URLSearchParams();
+    searchParams.set("page", "1");
+    searchParams.set("q", search);
+    console.log(searchParams.toString());
+    router.push("/courses/search?" + searchParams.toString());
 
-  const navigationRoute = [
-    { name: "Home", route: "/" },
-    { name: "Dashboard", route: "/dashboard" },
-    { name: "Courses", route: "/courses" },
-    { name: "Informations", route: "/informations" },
-    { name: "Profile", route: "/profile" },
-  ];
-
-  const recommendedCourses = [
-    { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "images/decorations/JS bootcamp 1.png", id: 1 },
-    { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "images/decorations/JS bootcamp 1.png", id: 2 },
-    { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "images/decorations/JS bootcamp 1.png", id: 3 },
-    { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "images/decorations/JS bootcamp 1.png", id: 4 },
-    { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "images/decorations/JS bootcamp 1.png", id: 5 },
-    { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "images/decorations/JS bootcamp 1.png", id: 6 },
-    { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "images/decorations/JS bootcamp 1.png", id: 7 },
-    { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "images/decorations/JS bootcamp 1.png", id: 8 },
-  ]
-
+  }
+  
   const courses = [
-    { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "images/decorations/JS bootcamp 1.png", id: 1 },
-    { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "images/decorations/JS bootcamp 1.png", id: 2 },
-    { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "images/decorations/JS bootcamp 1.png", id: 3 },
-    { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "images/decorations/JS bootcamp 1.png", id: 4 },
-    { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "images/decorations/JS bootcamp 1.png", id: 5 },
-    { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "images/decorations/JS bootcamp 1.png", id: 6 },
-    { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "images/decorations/JS bootcamp 1.png", id: 7 },
-    { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "images/decorations/JS bootcamp 1.png", id: 8 },
-    { title: "Course 9", author: "Author 9", duration: 120, rating: 4.5, image: "images/decorations/JS bootcamp 1.png", id: 9 },
-    { title: "Course 10", author: "Author 10", duration: 90, rating: 4.2, image: "images/decorations/JS bootcamp 1.png", id: 10 },
-    { title: "Course 11", author: "Author 11", duration: 150, rating: 4.7, image: "images/decorations/JS bootcamp 1.png", id: 11 },
-    { title: "Course 12", author: "Author 12", duration: 180, rating: 4.9, image: "images/decorations/JS bootcamp 1.png", id: 12 },
+    { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
+    { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
+    { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 3 },
+    { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 4 },
+    { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 5 },
+    { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 6 },
+    { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
+    { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
   ]
 
   return (
@@ -66,36 +45,32 @@ export default function Courses() {
       <title>
         Millenium LMS by GNF Labs
       </title>
-      <main className="flex h-full flex-col p-4">
+      <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
+      <main className="flex h-full flex-col px-8 pt-24 pb-4">
         <div className="parallax-bg" />
-        <NavigationBar logo={{source:"images/logo_GNF.png", width: 90, height: 90}} navigationMenu={navigationRoute} />
-        <h2 className="items-center flex flex-row w-full justify-center font-black py-8">
-            Recommended Courses
-        </h2>
-        <div ref={carouselRef} className="flex overflow-x-hidden carousel m-2 w-full">
-            {recommendedCourses.map((course, index) => (
-            <div key={index} className="flex-shrink-0 h-auto w-[23%] px-3 pt-1 pb-5">
-                <CourseCard title={course.title} author={course.author} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
-            </div>
-            ))}
+        <div className="flex flex-col pb-4 gap-y-3">
+          <h2 className="font-black text-2xl">
+            Search Course
+          </h2>
+          <div className="flex flex-row">
+            <form onSubmit={SearchCourses} className="flex items-center mb-8 w-1/3">
+              <input type="text" 
+                placeholder="Search"
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full px-4 py-2 border-2 border-blue-600 rounded-s-md focus:outline-none focus:border-2 focus:border-blue-800" />
+              <button 
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-e-md border-2 border-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:border-blue-600">Search
+              </button>
+            </form>
+          </div>
         </div>
-        <div className="flex flex-row justify-center space-x-4 mt-4">
-          <NormalButton1 text="Previous" onClick={scrollLeft} />
-          <NormalButton2 text="Next" onClick={scrollRight} />
+        <div className="space-y-8">
+          <CardCarousel title="Recommended For You" courses={courses} />
+          <CardCarousel title="Web Development" courses={courses} />
+          <CardCarousel title="Mobile Development" courses={courses} />
+          <CardCarousel title="Data Science" courses={courses} />
         </div>
-        <div>
-            <h2 className="items-center flex w-full justify-center font-black py-8">
-                All Courses
-            </h2>
-            <div className="grid grid-cols-4">
-                {courses.map((course,index) => (
-                <div key={index} className="flex-shrink-0 w-full px-3 pt-1 pb-5">
-                    <CourseCard title={course.title} author={course.author} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
-                </div>
-                ))}
-            </div>
-        </div>
-
 
       </main>
     </>

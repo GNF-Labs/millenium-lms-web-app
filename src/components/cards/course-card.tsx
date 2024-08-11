@@ -1,5 +1,6 @@
 import { FaStar } from 'react-icons/fa';
 import Link from 'next/link'
+import Image from 'next/image';
 
 interface CourseCardProps {
     /**
@@ -33,7 +34,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author, duration, rating
     if (duration % 60 === 0) {
         durationText = `${duration / 60} hour${duration / 60 > 1 ? 's' : ''}`;
     } else if (duration > 60) { 
-        durationText = `${Math.floor(duration/60)} hour${duration / 60 > 1 ? 's' : ''} ${duration} minute${duration % 60 > 1 ? 's' : ''}`;
+        durationText = `${Math.floor(duration/60)} hour${duration / 60 > 1 ? 's' : ''} ${duration%60} minute${duration % 60 > 1 ? 's' : ''}`;
     } else {
         durationText = `${duration} minute${duration > 1 ? 's' : ''}`;
     }
@@ -42,7 +43,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author, duration, rating
         <Link href={`/courses/${id}`} className=''>
             <div className="flex flex-col backdrop-blur-sm bg-[rgba(255,254,254,0.73)] rounded-[15px] shadow-md shadow-slate-600 hover:shadow-lg hover:shadow-slate-600 hover:-translate-y-0.5 transition-all h-full w-full">
                 <div className='h-1/2'>
-                    <img src={image} alt={title} className="rounded-t-[15px] object-cover h-full w-full"/>
+                    <img src={image ?? ""} alt={title} className="rounded-t-[15px] object-cover h-full w-full"/>
                 </div>
                 <div className="flex flex-col px-3 py-2 justify-between h-1/2">
                     <div>
