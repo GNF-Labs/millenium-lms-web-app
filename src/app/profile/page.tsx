@@ -8,42 +8,16 @@ import Head from 'next/head'
 import { CourseCard } from '@/components/menus/dashboard-courses-menu'
 import { ImportantButton, ImportantButton2 } from '@/components/buttons/important-button'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { fetchProfile } from '@/services/handlers'
+import { fetchProfile, handleUpdateProfile } from '@/services/handlers'
 import { useRouter } from 'next/navigation'
 import { readImage } from '@/services/mega'
 import { deleteToken } from '@/redux/slices/tokenSlice'
+import { StandardModal } from '@/components/modals'
+import { initialState, profileReducer } from './reducer'
+import { IoPencil } from 'react-icons/io5'
+import axios from 'axios'
+import { error } from 'console'
 
-// Define the initial state and action types for the reducer
-interface ProfileState {
-    profile: any;
-    loading: boolean;
-    error: string | null;
-}
-
-const initialState: ProfileState = {
-    profile: null,
-    loading: false,
-    error: null,
-};
-
-type Action =
-    | { type: 'FETCH_INIT' }
-    | { type: 'FETCH_SUCCESS'; payload: any }
-    | { type: 'FETCH_FAILURE'; payload: string };
-
-// Reducer function to manage the state
-function profileReducer(state: ProfileState, action: Action): ProfileState {
-    switch (action.type) {
-        case 'FETCH_INIT':
-            return { ...state, loading: true, error: null };
-        case 'FETCH_SUCCESS':
-            return { ...state, loading: false, profile: action.payload };
-        case 'FETCH_FAILURE':
-            return { ...state, loading: false, error: action.payload };
-        default:
-            throw new Error('Unhandled Action Type');
-    }
-}
 
 const ProfilePage = () => {
     const coursesList: { id: number, src: string, name: string, authorName: string, timeEstimated: string, rating: number }[] = [
@@ -76,7 +50,39 @@ const ProfilePage = () => {
     const [profileState, profileDispatch] = useReducer(profileReducer, initialState);
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState<boolean>(true);
+    const [editProfileVisible, SetEditProfileVisible] = useState<boolean>(false);
 
+    const [fullName, setFullName] = useState(profileState.profile?.full_name || ''); // Local state for the form inputs
+    const [about, setAbout] = useState(profileState.profile?.about || '');
+    const [editAvatar, setEditAvatar] = useState(profileState?.profile?.image_url || null)
+
+    const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFullName(e.target.value);
+        console.log(fullName);
+    };
+
+    const handleAboutChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setAbout(e.target.value);
+        console.log(about);
+    };
+
+    const handleChangeProfile = async () => {
+        try {
+            const {data, status} = await handleUpdateProfile(tokenSelector.username, tokenSelector.token as string, {full_name:fullName, about:about, image_url:editAvatar})
+            if (status === axios.HttpStatusCode.Ok) {
+                const updatedUser = data?.user
+                profileDispatch({type: 'CHANGE_STATE', payload: updatedUser})
+                await fetchProfileData();
+                
+                window.location.reload();
+                // SetEditProfileVisible(false);
+            } else{
+                console.error(data)
+            }
+        } catch(error) {
+            console.error(error)
+        }
+    }
 
     const dispatch = useAppDispatch();
     const tokenSelector = useAppSelector((state) => state.jwt)
@@ -86,6 +92,39 @@ const ProfilePage = () => {
         dispatch(deleteToken());
         router.push("/");
     }
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => setEditAvatar(reader.result as string);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const fetchProfileData = async () => {
+        profileDispatch({ type: 'FETCH_INIT' });
+        try {
+            const { status, data } = await fetchProfile(tokenSelector.username, tokenSelector.token || "");
+    
+            if (status === 403) {
+                router.push("/login");
+                return;
+            }
+            console.log(data);
+            profileDispatch({ type: 'FETCH_SUCCESS', payload: data });
+    
+            const imageUrl = await readImage(data.image_url);
+    
+            setProfileImage(imageUrl);
+            setImageLoading(false);
+            setFullName(data.full_name);
+            setAbout(data.about);
+        } catch (error) {
+            profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
+        }
+    };
+
     useEffect(() => {
         const req = async () => {
             profileDispatch({ type: 'FETCH_INIT' });
@@ -96,17 +135,21 @@ const ProfilePage = () => {
                     router.push("/login");
                     return;
                 }
+                console.log(data);
                 profileDispatch({ type: 'FETCH_SUCCESS', payload: data });
 
                 const imageUrl = await readImage(data.image_url);
 
                 setProfileImage(imageUrl);
                 setImageLoading(false);
+                setFullName(data.full_name)
+                setAbout(data.about)
             } catch (error) {
                 profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
             }
         }
         req();
+        console.log('Token value:', tokenSelector.token);
     }, [router, tokenSelector])
 
     return (
@@ -114,6 +157,37 @@ const ProfilePage = () => {
             <title>
                 Profile
             </title>
+            <StandardModal visible={editProfileVisible} setVisible={SetEditProfileVisible}>
+                <div className='space-y-2 flex flex-col'>
+                    <div className='w-full flex flex-col items-center'>
+
+                        <div className='relative w-[120px] aspect-square bg-slate-500 rounded-full overflow-hidden border border-gray-500'>
+
+                            <Image
+                                src={editAvatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9cSGzVkaZvJD5722MU5A-JJt_T5JMZzotcw&s'}
+                                alt="Profile Picture"
+                                layout="fill"
+                                objectFit="cover"
+                                style={{ alignSelf: 'center'}}
+                            />
+                        </div>
+                        <div className='h-2'/>
+                        <label className='flex flex-row w-fit items-center cursor-pointer'>
+                            <IoPencil className='text-black mr-2' />
+                            <span className='text-black'>Ganti Avatar</span>
+                            <input type='file' accept='image/*' onChange={handleAvatarChange} style={{display: 'none'}}/>
+                        </label>
+                    </div>
+
+                    <h2>Nama</h2>
+                    <input name='Nama' className='border-black border w-[100%] px-2 text-black' value={fullName} onChange={handleFullNameChange} />
+                    <h2>Tentang</h2>
+                    <textarea name='Tentang' className='border-black border w-[100%] px-2 text-black' value={about} onChange={handleAboutChange} rows={6} />
+                    <div className='h-2' />
+                    <ImportantButton2 text='Simpan' onClick={handleChangeProfile} />
+
+                </div>
+            </StandardModal>
             <NavigationBar logo={{ source: "images/logo_GNF.png", width: 90, height: 90 }} navigationMenu={navigationRoute} />
             <div className="flex min-h-screen flex-col p-4">
 
@@ -137,18 +211,24 @@ const ProfilePage = () => {
                                 )}
                             </div>
                             <div className='space-y-2'>
-                                <h2 className='font-bold'>{profileState.profile?.full_name}</h2>
-                                <h2 className='text-base'>@{profileState.profile?.username}</h2>
+                                <h2 className='font-bold'>{profileState.profile?.full_name || ''}</h2>
+                                <h2 className='text-base'>{profileState.profile?.username ? `@${profileState.profile?.username}` : ''}</h2>
                                 <div className='h-1' />
                                 <p>
                                     {profileState.profile?.about || "No Description"}
                                 </p>
 
+
                             </div>
                             {/* <button className='bg-slate-700 w-full py-2 rounded-lg'>
                                 <p className='text-[#eee]'>Edit Profile</p>
                             </button> */}
-                            <ImportantButton2 text={'Sunting Profil'} />
+                            <ImportantButton2 text={'Sunting Profil'} onClick={() => {
+                                setFullName(profileState?.profile.full_name);
+                                setAbout(profileState?.profile.about);
+                                setEditAvatar(profileState?.profile?.image_url)
+                                SetEditProfileVisible(true);
+                            }} />
                             <ImportantButton2 text={'Log Keluar'} onClick={handleLogout} />
                         </div>
                         <div className='w-[7.5%]' />

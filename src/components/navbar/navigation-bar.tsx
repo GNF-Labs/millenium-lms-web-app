@@ -121,7 +121,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
     }
   }
   return (
-    <div className='flex items-center flex-row justify-between pr-16 pl-8 py-1 z-50 w-full fixed text-black bg-blue-300/50 shadow-sm'>
+    <div className='flex items-center flex-row justify-between pr-16 pl-8 py-1 z-10 w-full fixed text-black bg-blue-300/50 shadow-sm'>
       <div className="flex items-center">
         <Image src={`/${logo.source}`} alt="Logo" width={logo.width} height={logo.height} />
       </div>

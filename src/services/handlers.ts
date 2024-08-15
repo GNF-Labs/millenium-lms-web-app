@@ -1,5 +1,6 @@
 import { API_URI } from "@/app/constants"
 import axios from "axios"
+import { headers } from "next/headers";
 
 export const fetchProfile = async (username: string, token: string) => {
   try {
@@ -69,5 +70,20 @@ export const handleLogin = async (formData: FormData) => {
     }
 
   throw new Error(`Error whilst login: ${error.message}`)
+  }
+}
+
+export const handleUpdateProfile = async (username: string, token: string, data: {[key: string]: any}) => {
+  try {
+    const response = await axios.put(`${API_URI}/profile/${username}`, data,  {headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }});
+    return {
+      status: response.status,
+      data: response.data,
+    };
+  } catch(error: any) {
+    throw new Error(`Error updating prifle: ${error.message}`)
   }
 }
