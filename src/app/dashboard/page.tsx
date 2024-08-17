@@ -1,7 +1,7 @@
 'use client'
 
 import NavigationBar from '@/components/navbar/navigation-bar'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { navigationRoute } from '../constants'
 import { Arisu } from '@/components/decorations'
 import Image from 'next/image'
@@ -9,8 +9,33 @@ import { ImportantButton } from '@/components/buttons/important-button'
 import {DashboardCoursesMenu} from '@/components/menus/dashboard-courses-menu'
 import SearchTextInput from '@/components/input-fields/search-text-input'
 import DashboardStatisticMenu from '@/components/menus/dashboard-statistics-menu'
+import { useRouter } from 'next/navigation'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { fetchProfile } from '@/services/handlers'
 
 const Dashboard = () => {
+    const dispatch = useAppDispatch();
+    const tokenSelector = useAppSelector((state) => state.jwt)
+    const router = useRouter();
+    const [profileLoaded, setProfileLoaded] = useState<boolean>(false);
+
+    const req = async () => {
+        try {
+            const { status, data } = await fetchProfile(tokenSelector.username, tokenSelector.token || "");
+            if (status === 403 || status === 401) {
+                router.push("/login");
+                return;
+            } else {
+                setProfileLoaded(true)
+            }
+        } catch (error) {
+            
+        }
+    }
+    useEffect(() => {
+        req();
+    }, [router, tokenSelector])
+
     return (
         <>
             <NavigationBar logo={{ source: "images/logo_GNF.png", width: 90, height: 90 }} navigationMenu={navigationRoute} />
@@ -19,6 +44,7 @@ const Dashboard = () => {
                     Dashboard
                 </title>
                 <div className='parallax-bg' />
+                {profileLoaded &&
                 <div className='flex flex-1 space-x-8 flex-row justify-between p-8 h-full mt-12'>
                     <div className='flex flex-col w-[55%] space-y-4'>
                         <div className='flex flex-row max-h-[50%] space-x-8 w-full justify-between bg-[rgba(255,254,254,0.73)] rounded-[10px] p-8 mt-4'/* My Progress Part*/ >
@@ -82,7 +108,7 @@ const Dashboard = () => {
                     </div>
 
                 </div>
-
+                }
 
             </main>
         </>
