@@ -1,11 +1,11 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC, useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { redirect, useRouter } from 'next/navigation'
 import { API_URI } from '@/app/constants'
 import store from '@/redux/store'
-import { getToken } from '@/redux/slices/tokenSlice'
+import { getToken, deleteToken } from '@/redux/slices/tokenSlice'
 
 interface NavigationBarProps {
   /**
@@ -38,7 +38,6 @@ const navigationRoute = [
   { name: "Home", route: "/" },
   { name: "Dashboard", route: "/dashboard" },
   { name: "Courses", route: "/courses" },
-  { name: "Informations", route: "/informations" },
   { name: "Profile", route: "/profile" },
 ];
 
@@ -71,6 +70,70 @@ const TheLink: FC<TheLinkProps> = ({ name, route, style, onClick }) => {
   )
 }
 
+interface AccountDropdownProps {
+  profileClick?: (e: any) => any
+  logoutClick?: (e: any) => any
+}
+
+const AccountDropdown: FC<AccountDropdownProps> = ({ profileClick, logoutClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Close the dropdown if the user clicks outside of it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        className="flex items-center space-x-2 focus:outline-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <img
+          src="https://via.placeholder.com/40"
+          alt="Profile"
+          className="w-10 h-10 rounded-full"
+        />
+      </button>
+      <div
+        className={`absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg transition-transform duration-300 ease-out transform ${
+          isOpen
+            ? 'opacity-100 scale-100'
+            : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+      >
+        <ul className="py-1 text-gray-700">
+          <li>
+            <button
+              onClick={profileClick}
+              className="block w-full px-4 py-2 hover:bg-gray-100 text-left"
+            >
+              My Profile
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={logoutClick}
+              className="block w-full px-4 py-2 hover:bg-gray-100 text-left"
+            >
+              Log out
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = navigationRoute }) => {
   const router = useRouter()
@@ -92,6 +155,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
       unsubscribe();
     };
   }, []);
+
+  const handleLogout = () => {
+    dispatch(deleteToken());
+    router.push("/");
+  }
+  
   const handleProfileClick = async (e: React.MouseEvent) => {
     if (!tokenSelector.token) {
       router.push("/login");
@@ -129,8 +198,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
         <TheLink name='Home' route='/' />
         <TheLink name='Dashboard' route='/dashboard' />
         <TheLink name='Courses' route='/courses' />
-        <TheLink name='Informations' route='/informations' />
-        <TheLink name='Profile' route={`/profile/${tokenSelector.username}`} onClick={handleProfileClick} />
+        <AccountDropdown profileClick={handleProfileClick} logoutClick={handleLogout} />
       </div>
     </div>
   )
