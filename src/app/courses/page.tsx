@@ -9,7 +9,8 @@ import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { CourseCard } from "@/components/cards/course-card";
 import { CardCarousel } from "@/components/cards/card-carousel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchCourses } from "@/services/handlers";
 
 /**
  * Courses Screen
@@ -17,6 +18,8 @@ import { useState } from "react";
  */
 export default function Courses() {
   const router = useRouter();
+  const [courseState, setCourseState] = useState([]);
+  const [load, setLoad] = useState(false);
   const [search, setSearch] = useState("");
   const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,8 +29,32 @@ export default function Courses() {
     searchParams.set("q", search);
     console.log(searchParams.toString());
     router.push("/courses/search?" + searchParams.toString());
-
   }
+
+  const fetchCourseData = async () => {
+    const { status, data } = await fetchCourses();
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      author: "m",
+      image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+    }));
+    return courses;
+  }
+  useEffect(() => {
+    const init = async () => {
+      const dbCourses = await fetchCourseData();
+      setCourseState(dbCourses);
+      setLoad(true);
+    };
+    init();
+  },[]);
   
   const courses = [
     { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
@@ -39,6 +66,11 @@ export default function Courses() {
     { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
     { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
   ]
+  if(!load){
+    return
+  }
+  console.log(courseState);
+  console.log(courses);
 
   return (
     <>
@@ -66,7 +98,7 @@ export default function Courses() {
           </div>
         </div>
         <div className="space-y-8">
-          <CardCarousel title="Recommended For You" courses={courses} />
+          <CardCarousel title="Recommended For You" courses={courseState} />
           <CardCarousel title="Web Development" courses={courses} />
           <CardCarousel title="Mobile Development" courses={courses} />
           <CardCarousel title="Data Science" courses={courses} />

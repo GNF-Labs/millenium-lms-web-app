@@ -1,5 +1,5 @@
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { CourseCard } from './course-card';
+import { CourseCard, CourseCardProps } from './course-card';
 import { useRef } from 'react';
 
 interface CardCarouselProps {
@@ -10,7 +10,7 @@ interface CardCarouselProps {
     /**
      * The list of courses to be displayed in the carousel
      */
-    courses: { title: string, author: string, duration: number, rating: number, image: string, id: number }[];
+    courses: CourseCardProps[];
 }
 
 const CardCarousel: React.FC<CardCarouselProps> = ({ title, courses }) => {
@@ -42,7 +42,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ title, courses }) => {
           <div ref={carouselRef} className="flex overflow-x-hidden carousel w-full gap-x-4">
               {courses.map((course, index) => (
               <div key={index} className="flex-shrink-0 h-auto w-[23%] pt-1 pb-5">
-                  <CourseCard title={course.title} author={course.author} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
+                  <CourseCard title={course.title} author={course.author ?? undefined} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
               </div>
               ))}
           </div>
