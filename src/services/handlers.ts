@@ -31,6 +31,55 @@ export const fetchProfile = async (username: string, token: string) => {
   }
 }
 
+export const fetchCourses = async () => {
+  try {
+    const response = await axios.get(`${API_URI}/courses`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+
+    return {
+      status: response.status,
+      data: response.data["courses"],
+    };
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        status: error.response.status,
+        data: error.response.data,
+      };
+    }
+    throw new Error(`Error fetching courses: ${error.message}`);
+
+  }
+}
+
+export const fetchCourseById = async (id:number) => {
+  try {
+    const response = await axios.get(`${API_URI}/courses/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+
+    return {
+      status: response.status,
+      data: response.data["course"],
+    };
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        status: error.response.status,
+        data: error.response.data,
+      };
+    }
+    throw new Error(`Error fetching courses: ${error.message}`);
+
+  }
+}
 export const handleRegister = async (formData: FormData) => {
   try {
 

@@ -9,10 +9,8 @@ import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { CourseCard } from "@/components/cards/course-card";
 import { CardCarousel } from "@/components/cards/card-carousel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useReducer, useState } from "react";
-import { initialState, reducer } from "./reducer";
-import { getCourses } from "@/services/course-handlers";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { fetchCourses } from "@/services/handlers";
 
 /**
  * Courses Screen
@@ -20,6 +18,8 @@ import axios from "axios";
  */
 export default function Courses() {
   const router = useRouter();
+  const [courseState, setCourseState] = useState([]);
+  const [load, setLoad] = useState(false);
   const [search, setSearch] = useState("");
   const [allDataLoaded, setAllDataLoaded] = useState(true);
   const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,34 +30,33 @@ export default function Courses() {
     searchParams.set("q", search);
     console.log(searchParams.toString());
     router.push("/courses/search?" + searchParams.toString());
-
   }
 
-  const [recommendationState, recommendationDispatch] = useReducer(reducer, initialState);
-  
-  useEffect(()=> {
-    const fetchCourses = async () => {
-      // fetch for recommendation 
-      try {
-        setAllDataLoaded(false);
-        const {data:data1, status:status1} = await getCourses();
-        if (status1 !== axios.HttpStatusCode.Ok) {
-          console.error(data1);
-          recommendationDispatch({type: 'SET_ERROR', payload: data1?.error || data1})
-          return;
-        }
-
-        // change the recommendation state
-        console.log(data1);
-        recommendationDispatch({type: 'SET_COURSES', payload: data1.courses});
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setAllDataLoaded(true);
-      }
+  const fetchCourseData = async () => {
+    const { status, data } = await fetchCourses();
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
     }
-    fetchCourses()
-  }, [])
+    const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      author: "m",
+      image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+    }));
+    return courses;
+  }
+  useEffect(() => {
+    const init = async () => {
+      const dbCourses = await fetchCourseData();
+      setCourseState(dbCourses);
+      setLoad(true);
+    };
+    init();
+  },[]);
+  
   const courses = [
     { name: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", time_estimated: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
     { name: "Course 2", author: "Author 2", time_estimated: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
@@ -68,6 +67,11 @@ export default function Courses() {
     { name: "Course 7", author: "Author 7", time_estimated: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
     { name: "Course 8", author: "Author 8", time_estimated: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
   ]
+  if(!load){
+    return
+  }
+  console.log(courseState);
+  console.log(courses);
 
   return (
     <>
@@ -95,7 +99,7 @@ export default function Courses() {
           </div>
         </div>
         <div className="space-y-8">
-          {allDataLoaded && <CardCarousel title="Recommended For You" courses={recommendationState?.courses ? recommendationState.courses as Array<any> : []} />}
+          <CardCarousel title="Recommended For You" courses={courseState} />
           <CardCarousel title="Web Development" courses={courses} />
           <CardCarousel title="Mobile Development" courses={courses} />
           <CardCarousel title="Data Science" courses={courses} />

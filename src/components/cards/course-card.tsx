@@ -2,7 +2,7 @@ import { FaStar } from 'react-icons/fa';
 import Link from 'next/link'
 import Image from 'next/image';
 
-interface CourseCardProps {
+export interface CourseCardProps {
     /**
      * The title of the course
      */
@@ -10,11 +10,11 @@ interface CourseCardProps {
     /**
      * The author of the course
      */
-    author: string;
+    author?: string;
     /**
      * The duration of the course (in minutes)
      */
-    duration: number;
+    duration?: number;
     /**
      * The rating of the course (in minutes)
      */
@@ -29,7 +29,7 @@ interface CourseCardProps {
     id: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ title, author, duration, rating, image, id }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration = 100, rating, image, id }) => {
     let durationText;
     // if (duration % 60 === 0) {
     //     durationText = `${duration / 60} hour${duration / 60 > 1 ? 's' : ''}`;
