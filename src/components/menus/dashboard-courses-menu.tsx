@@ -24,7 +24,7 @@ interface CourseCardProps {
     /**
      * Name of the course's author
      */
-    authorName: string;
+    authorName?: string;
 
     /**
      * Time Estimated Taken to finish the course
@@ -48,7 +48,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                 <Image src={logoSource} alt="" width={30} height={30} />
                 <div className='flex flex-col justify-center'>
                     <h2 className='font-bold text-[14px]'>{name}</h2>
-                    <p className='text-[12px]'>By {authorName}</p>
                 </div>
             </div>
             <div className='flex flex-row space-x-4'>
