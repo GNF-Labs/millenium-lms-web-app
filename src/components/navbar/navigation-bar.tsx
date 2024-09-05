@@ -64,9 +64,10 @@ const TheLink: FC<TheLinkProps> = ({ name, route, style, onClick }) => {
 
 
   return (
-    <button style={style} onClick={handleClick} className='font-bold lg:text-[20px] sm:text-sm'>
-      {name}
-    </button>
+    <Link style={style} className='font-bold lg:text-[20px] sm:text-sm' href={route}>
+      <p>{name}</p>
+      
+    </Link>
   )
 }
 
