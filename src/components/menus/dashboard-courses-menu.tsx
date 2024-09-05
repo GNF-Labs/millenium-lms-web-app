@@ -63,7 +63,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='Lihat' onClick={() => { console.log("masa ini error sih?") }} />
+            <Link href={`/courses/${id}`}>
+                <ImportantButton text='Lihat' />
+            </Link>
 
         </div>
     )
