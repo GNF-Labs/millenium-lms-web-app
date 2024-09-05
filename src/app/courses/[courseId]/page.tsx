@@ -4,36 +4,91 @@ import NavigationBar from "@/components/navbar/navigation-bar";
 import ProgressBar from "@/components/progress-bar/progress-bar";
 import Accordion from "@/components/accordion/accordion";
 import Review from "@/components/review/review";
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { navigationRoute } from "@/app/constants";
 import { Tabs } from "@/components/tabs/tabs";
+import { fetchCourseById } from "@/services/handlers";
+import { FaStar } from "react-icons/fa";
 
 /**
  * Course Screen
  * @returns
  */
-export default function Course({ params }: { params: { courseId: string } }) {
+export default function Course({ params }: { params: { courseId: number } }) {
     const [selectedTab, setSelectedTab] = useState("Content")
-    // const course = await fetch('[apilink]').then((res) => res.json())
-    const courses = [
-        { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
-        { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
-        { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 3 },
-        { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 4 },
-        { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 5 },
-        { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 6 },
-        { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
-        { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
-        { title: "Course 9", author: "Author 9", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 9 },
-        { title: "Course 10", author: "Author 10", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 10 },
-        { title: "Course 11", author: "Author 11", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 11 },
-        { title: "Course 12", author: "Author 12", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 12 },
-    ]
-    const course = courses.find((course) => course.id === parseInt(params.courseId))
+    const [enrolled, setEnrolled] = useState(false)
+    const [dbCourse, setDbCourse] = useState<any>(null)
+    const fetchCourseData = async () => {
+      const { status, data } = await fetchCourseById(params.courseId);
+      if (status !== 200) {
+        console.error(`Error fetching courses: ${data}`);
+        return [];
+      }
+      const course = {
+        title: data.name,
+        duration: data.time_estimated,
+        rating: data.rating,
+        id: data.id,
+        description: data.description,
+        author: "m",
+        image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+      };
+      return course;
+    }
+    useEffect(() => {
+      const init = async () => {
+        const dbCourse = await fetchCourseData();
+        setDbCourse(dbCourse);
+        console.log(dbCourse);
+      };
+      init();
+    },[]);
+    // const course = courses.find((course) => course.id === params.courseId)
 
 
     const tabOptions = ["Content", "Course Info", "Reviews", "Announcements"]
     const changeTab = (selectedOption: string) => { setSelectedTab(selectedOption) }
+
+    const renderOverview = () => {
+      if(enrolled){
+        return (
+          <div className="backdrop-blur-md bg-[rgba(255,254,254,0.73)] rounded-2xl shadow-md h-full w-2/5 p-4 space-y-2">
+            <h3 className="font-black text-black text-2xl">
+            Course Progress
+            </h3>
+            <div className="flex flex-row justify-between">
+              <p>1/23</p>
+              <p>4% Complete</p>
+            </div>
+            <ProgressBar progress={4} />
+            <div className="h-10"/>
+            <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors">
+              Continue Learning
+            </button>
+            <p className="text-center">You enrolled in the course on January 14, 2023</p>
+          </div>
+        )
+      } else {
+        return(
+          <div className="backdrop-blur-md bg-[rgba(255,254,254,0.73)] rounded-2xl shadow-md h-full w-2/5 p-4 space-y-2">
+            <h3 className="font-black text-black text-2xl">
+              Course Overview
+            </h3>
+            <span className="flex items-center text-black">
+              <>
+                <p className="pr-2">Overall Rating</p>
+                <FaStar color="yellow"/>
+              </>
+              <p className="pl-1">{dbCourse !== null ? dbCourse.rating : "-"}</p>
+            </span>
+            <div className="h-10"/>
+            <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors">
+              Enroll Course
+            </button>
+          </div>
+        )
+      }
+    }
     const renderTabContent = () => {
         switch(selectedTab) {
             case "Content":
@@ -95,7 +150,7 @@ export default function Course({ params }: { params: { courseId: string } }) {
                 )
             case "Course Info":
                 return (
-                    <p>{course?.author}</p>
+                    <p>{dbCourse?.description}</p>
                 )
             case "Reviews":
                 return (
@@ -106,7 +161,7 @@ export default function Course({ params }: { params: { courseId: string } }) {
                 )
             case "Announcements":
                 return (
-                    <p>{course?.author}</p>
+                    <p>{dbCourse?.author}</p>
                 )
             default:
                 return null
@@ -123,30 +178,16 @@ export default function Course({ params }: { params: { courseId: string } }) {
                 <div className="parallax-bg" />
                 <div className="py-8"/>
                 <div className="px-12">
-                    <h2 className="flex flex-row w-full font-black py-4">
-                        {course?.title}
-                    </h2>
+                    <h1 className="flex flex-row w-full font-black py-4">
+                        {dbCourse?.title}
+                    </h1>
                     <div className="flex flex-row h-96 w-full justify-between space-x-4">
                         <img
                         className="rounded-2xl h-full w-3/5 object-cover shadow-md" 
-                        src={course?.image ?? ""}
-                        alt={course?.title ?? ""}
+                        src={dbCourse?.image ?? ""}
+                        alt={dbCourse?.title ?? ""}
                         />
-                        <div className="backdrop-blur-md bg-[rgba(255,254,254,0.73)] rounded-2xl shadow-md h-full w-2/5 p-4 space-y-2">
-                            <h3 className="font-black text-black text-2xl">
-                            Course Progress
-                            </h3>
-                            <div className="flex flex-row justify-between">
-                                <p>1/23</p>
-                                <p>4% Complete</p>
-                            </div>
-                            <ProgressBar progress={4} />
-                            <div className="h-10"/>
-                            <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors">
-                                Continue Learning
-                            </button>
-                            <p className="text-center">You enrolled in the course on January 14, 2023</p>
-                        </div>
+                        {renderOverview()}
                     </div>
                     <div className="py-2"/>
                     <Tabs options={tabOptions} onSelectTab={changeTab} />

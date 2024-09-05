@@ -59,7 +59,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration =
                 <div className="flex flex-col px-3 py-2 justify-between h-1/2">
                     <div>
                         <p className="text-xs text-gray-700">{author}</p>
-                        <p className="font-extrabold text-lg text-black">{title}</p>
+                        <p className="font-extrabold text-lg text-black line-clamp-2">{title}</p>
                     </div>
                     <div className="flex flex-row justify-between text-sm">
                         <span className="flex items-center justify-center text-black">

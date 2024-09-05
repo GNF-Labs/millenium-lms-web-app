@@ -2,10 +2,11 @@
 
 import { navigationRoute } from "@/app/constants";
 import NavigationBar from "@/components/navbar/navigation-bar";
-import { CourseCard } from "@/components/cards/course-card";
+import { CourseCard, CourseCardProps } from "@/components/cards/course-card";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, } from "react";
+import { useState, useEffect } from "react";
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
+import { searchCourses } from "@/services/course-handlers";
 
 /**
  * Course Search Screen
@@ -13,55 +14,57 @@ import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
  */
 export default function Courses() {
     const router = useRouter();
-    const currentParams = useSearchParams();
-    const [search, setSearch] = useState(currentParams.get("q") ?? "");
-    
-    const title = currentParams.get("q") ?? ""
-    const page = parseInt(currentParams.get("page") ?? "1")
-    const totalPages = 5 // ganti dengan jumlah halaman yang sesuai
+    const [params, setParams] = useState(new URLSearchParams(useSearchParams()));
+    const [load, setLoad] = useState(false);
+    const [totalPages, setTotalPages] = useState(1);
+    const [search, setSearch] = useState(params.get("q") ?? "");
+    const [courseState, setCourseState] = useState([{title:"", duration:0, rating:0, id:0, author:"", image:""}]);
 
     const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(search === "") {return;}
         const searchParams = new URLSearchParams();
-        searchParams.set("q", search);
+        if(search !== "") {
+            searchParams.set("q", search);
+        }
+        searchParams.set("page", "1");
         router.push("/courses/search?" + searchParams.toString());
+        setParams(searchParams);
     }
     const ChangePage = (newPage: number) => {
         const searchParams = new URLSearchParams();
-        searchParams.set("page", newPage.toString());
         searchParams.set("q", search);
+        searchParams.set("page", newPage.toString());
         router.push("/courses/search?" + searchParams.toString());
+        setParams(searchParams);
     }
     
-    const courses = [
-        { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
-        { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
-        { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 3 },
-        { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 4 },
-        { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 5 },
-        { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 6 },
-        { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
-        { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
-        { title: "Course 9", author: "Author 9", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 9 },
-        { title: "Course 10", author: "Author 10", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 10 },
-        { title: "Course 11", author: "Author 11", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 11 },
-        { title: "Course 12", author: "Author 12", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 12 },
-        { title: "Course 13", author: "Author 13", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 13 },
-        { title: "Course 14", author: "Author 14", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 14 },
-        { title: "Course 15", author: "Author 15", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 15 },
-    ]
-    const filteredCourses = courses.filter(course => course.title.toLowerCase().includes(title.toLowerCase()))
-    // const shownCourses = filteredCourses.slice((page-1)*5, 10)
+    const fetchCourseData = async () => {
+        const { status, data } = await searchCourses(params);
+        if (status !== 200) {
+            console.error(`Error fetching courses: ${data}`);
+            return [];
+        }
+        setTotalPages(data["total_pages"]);
+        const courses = data["courses"].map((course: any) => ({
+            title: course.name,
+            duration: course.time_estimated,
+            rating: course.rating,
+            id: course.id,
+            author: "m",
+            image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+        }))
+        return courses;
+    }
 
     const GetPageNumbers = () => {
         let pages = [];
+        let currPage = parseInt(params.get("page") ?? "1");
     
         // Always include the first page
         pages.push(1);
     
         // Pages within range of ±2 from the current page
-        for (let i = page - 2; i <= page + 2; i++) {
+        for (let i = currPage - 2; i <= currPage + 2; i++) {
           if (i > 1 && i < totalPages) {
             pages.push(i);
           }
@@ -76,6 +79,17 @@ export default function Courses() {
         return pages;
       };
     const pageNumbers = GetPageNumbers();
+    
+    
+    const init = async () => {
+        const dbCourses = await fetchCourseData();
+        setCourseState(dbCourses);
+        setLoad(true);
+    };
+    useEffect(() => {
+        setLoad(false);
+        init();
+    },[params]);
 
     return (
         <>
@@ -90,33 +104,33 @@ export default function Courses() {
                     Search Course
                 </h2>
                 <div className="flex flex-row">
-                <form onSubmit={SearchCourses} className="flex items-center mb-8 w-1/3">
-                    <input type="text" 
-                        placeholder="Search"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-blue-600 rounded-s-md focus:outline-none focus:border-2 focus:border-blue-800" />
-                    <button 
-                        type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-e-md border-2 border-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:border-blue-600">Search
-                    </button>
+                    <form onSubmit={SearchCourses} className="flex items-center mb-8 w-1/3">
+                        <input type="text" 
+                            placeholder="Search"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full px-4 py-2 border-2 border-blue-600 rounded-s-md focus:outline-none focus:border-2 focus:border-blue-800" />
+                        <button 
+                            type="submit"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-e-md border-2 border-blue-600 hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:border-blue-600">Search
+                        </button>
                     </form>
                 </div>
             </div>
             <div>
                 <div className="grid grid-cols-5 gap-x-4">
-                    {filteredCourses.map((course,index) => (
+                {load ? courseState.map((course,index) => (
                         <div key={index} className="flex-shrink-0 w-full pt-1 pb-5">
                             <CourseCard title={course.title} author={course.author} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
                         </div>
-                    ))}
+                )): null}
                 </div>
             </div>
             <div className="flex flex-row justify-center align-middle relative my-3">
                 <button 
-                    disabled={page === 1}
-                    onClick={() => ChangePage(page-1)}>
-                    <FaCaretLeft className="left-0 transform text-3xl text-black" />
+                    disabled={parseInt(params.get("page") ?? "1") === 1}
+                    onClick={() => ChangePage(parseInt(params.get("page") ?? "1")-1)}>
+                    <FaCaretLeft className="left-0 transform text-3xl text-black disabled:text-gray-600" />
                 </button>
                 <div className="flex space-x-1">
                     {pageNumbers.map((pageNumber, index) => {
@@ -128,7 +142,7 @@ export default function Courses() {
                         <button
                             onClick={() => ChangePage(pageNumber)}
                             className={`px-3 py-1 ${
-                            page === pageNumber
+                                parseInt(params.get("page") ?? "1") === pageNumber
                                 ? 'text-black font-black'
                                 : 'text-gray-600'
                             }`}
@@ -140,9 +154,9 @@ export default function Courses() {
                     })}
                 </div>
                 <button
-                    disabled={page === totalPages}
-                    onClick={() => ChangePage(page+1)}>
-                    <FaCaretRight className="right-0 transform text-3xl text-black" />
+                    disabled={parseInt(params.get("page") ?? "1") === totalPages}
+                    onClick={() => ChangePage(parseInt(params.get("page") ?? "1")+1)}>
+                    <FaCaretRight className="right-0 transform text-3xl text-black disabled:text-gray-600" />
                 </button>
             </div>
         </main>

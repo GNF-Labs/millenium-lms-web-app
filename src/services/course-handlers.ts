@@ -13,3 +13,16 @@ export const getCourses = async () => {
         throw new Error(`Error while getting courses. ${error}`)
     }
 }
+
+export const searchCourses = async (params: URLSearchParams) => {
+    try {
+        const response = await axios.get(`${API_URI}/courses?${params.toString()}`);
+
+        return {
+            status: response.status,
+            data: response.data
+        }
+    } catch(error: any) {
+        throw new Error(`Error while searching courses. ${error}`)
+    }
+}
