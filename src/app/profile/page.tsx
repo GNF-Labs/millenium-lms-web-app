@@ -68,14 +68,16 @@ const ProfilePage = () => {
 
     const handleChangeProfile = async () => {
         try {
+            console.log((editAvatar as string).substring(0,20))
             const {data, status} = await handleUpdateProfile(tokenSelector.username, tokenSelector.token as string, {full_name:fullName, about:about, image_url:editAvatar})
             if (status === axios.HttpStatusCode.Ok) {
                 const updatedUser = data?.user
                 profileDispatch({type: 'CHANGE_STATE', payload: updatedUser})
-                await fetchProfileData();
+                setProfileImage(editAvatar);
                 
-                window.location.reload();
-                // SetEditProfileVisible(false);
+                // await fetchProfileData();
+                // window.location.reload();
+                SetEditProfileVisible(false);
             } else{
                 console.error(data)
             }
@@ -120,6 +122,7 @@ const ProfilePage = () => {
             setImageLoading(false);
             setFullName(data.full_name);
             setAbout(data.about);
+            SetEditProfileVisible(false);
         } catch (error) {
             profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
         }
@@ -139,13 +142,15 @@ const ProfilePage = () => {
                 profileDispatch({ type: 'FETCH_SUCCESS', payload: data });
 
                 const imageUrl = await readImage(data.image_url);
-
+                console.log("image url:", imageUrl);                    
                 setProfileImage(imageUrl);
+                setFullName(data.full_name);
+                setAbout(data.about);
                 setImageLoading(false);
-                setFullName(data.full_name)
-                setAbout(data.about)
             } catch (error) {
                 profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
+            } finally {
+                setImageLoading(false);
             }
         }
         req();
@@ -166,9 +171,9 @@ const ProfilePage = () => {
                             <Image
                                 src={editAvatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9cSGzVkaZvJD5722MU5A-JJt_T5JMZzotcw&s'}
                                 alt="Profile Picture"
-                                layout="fill"
-                                objectFit="cover"
-                                style={{ alignSelf: 'center'}}
+                                fill
+                                sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                style={{ alignSelf: 'center', objectFit: 'cover' }}
                             />
                         </div>
                         <div className='h-2'/>
@@ -205,8 +210,9 @@ const ProfilePage = () => {
                                     <Image
                                         src={profileImage || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9cSGzVkaZvJD5722MU5A-JJt_T5JMZzotcw&s'}
                                         alt="Profile Picture"
-                                        layout="fill"
-                                        objectFit="cover"
+                                        fill
+                                        sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        style={{objectFit: "cover"}}
                                     />
                                 )}
                             </div>
