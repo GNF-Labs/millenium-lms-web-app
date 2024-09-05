@@ -7,6 +7,7 @@ import { poppins } from "./fonts";
 import { Provider as ReduxProvider } from "react-redux";
 import store from "@/redux/store";
 import ClientSideInitializer from "@/services/init";
+import UserBehaviourProvider from "@/providers/UserBehaviourProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="id">
       <ReduxProvider store={store}>
-        <ClientSideInitializer />
-        <body className={poppins.className}>{children}</body>
+        <UserBehaviourProvider>
+          <ClientSideInitializer onReady={() => console.log("content is ready")} />
+          <body className={poppins.className}>{children}</body>
+        </UserBehaviourProvider>
       </ReduxProvider>
     </html>
   );

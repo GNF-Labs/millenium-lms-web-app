@@ -23,6 +23,8 @@ export const readImage = async (url: string): Promise<string | null> => {
     try {
         if (!url.startsWith("https://mega.nz")) {
             return url;
+        } else if(url.startsWith("https://storage.googleapis.com")) {
+            return url;
         }
         const file = await File.fromURL(url).loadAttributes();
         const buffer = await file.downloadBuffer({});

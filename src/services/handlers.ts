@@ -124,15 +124,20 @@ export const handleLogin = async (formData: FormData) => {
 
 export const handleUpdateProfile = async (username: string, token: string, data: {[key: string]: any}) => {
   try {
+    console.log(token);
+    console.log(data);
+    console.log(username);
     const response = await axios.put(`${API_URI}/profile/${username}`, data,  {headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     }});
+
+    console.log(response.data)
     return {
       status: response.status,
       data: response.data,
     };
   } catch(error: any) {
-    throw new Error(`Error updating prifle: ${error.message}`)
+    throw new Error(`Error updating profile: ${error.message}`)
   }
 }
