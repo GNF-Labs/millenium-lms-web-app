@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react'
 import { ImportantButton } from '../buttons/important-button';
 import { FaClock, FaStar } from 'react-icons/fa';
+import Link from 'next/link';
 
 interface CourseCardProps {
     /**
@@ -62,7 +63,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='Lihat' onClick={()=>{console.log("masa ini error sih?")}} />
+            <ImportantButton text='Lihat' onClick={() => { console.log("masa ini error sih?") }} />
 
         </div>
     )
@@ -97,6 +98,8 @@ export const DashboardCoursesMenu = () => {
         },
     ];
 
+    const router = useRouter();
+
     return (
         <div className='flex flex-col space-y-2'>
             <h1 className='text-[32px]'>
@@ -110,10 +113,21 @@ export const DashboardCoursesMenu = () => {
                     <p className='font-bold hover:bg-gray-50/30'>Terbaru</p>
                 </button>
             </div>
-            <div className='flex flex-col space-y-4'>
-                {coursesList.map((item, index) => (
-                    <CourseCard id={item.id} key={index} logoSource={item.src} name={item.name} authorName={item.authorName} timeEstimated={item.timeEstimated} rating={item.rating} />
-                ))}
+            <div className='flex flex-row space-x-8'>
+                <div className='flex flex-col space-y-4 w-full'>
+                    {coursesList.map((item, index) => (
+                        <CourseCard id={item.id} key={index} logoSource={item.src} name={item.name} authorName={item.authorName} timeEstimated={item.timeEstimated} rating={item.rating} />
+                    ))}
+                </div>
+                <div className='w-[50%]'>
+                    <h1>
+                        Cari Course yang Lebih Banyak
+                    </h1>
+                    <div className='h-4' />
+                    <Link href={"/courses"}>
+                        <ImportantButton text='LIHAT SEMUA' />
+                    </Link>
+                </div>
             </div>
         </div>
     )

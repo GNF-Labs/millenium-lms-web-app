@@ -14,6 +14,25 @@ export const getCourses = async () => {
     }
 }
 
+export const getDashboard = async (username: string, token: string) => {
+    try {
+        const response = await axios.get(`${API_URI}/dashboard/${username}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            timeout: 10000
+        });
+
+        return {
+            status: response.status,
+            data: response.data
+        }
+    } catch(error: any) {
+        throw new Error(`Error while getting dashboard. ${error}`)
+    }
+}
+
 export const searchCourses = async (params: URLSearchParams) => {
     try {
         const response = await axios.get(`${API_URI}/courses?${params.toString()}`);

@@ -229,7 +229,6 @@ const ProfilePage = () => {
                                 setEditAvatar(profileState?.profile?.image_url)
                                 SetEditProfileVisible(true);
                             }} />
-                            <ImportantButton2 text={'Log Keluar'} onClick={handleLogout} />
                         </div>
                         <div className='w-[7.5%]' />
                         <div className='w-[90%] pt-4'>

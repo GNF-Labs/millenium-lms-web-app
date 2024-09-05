@@ -15,7 +15,6 @@ const DashboardStatisticMenu = () => {
                 <select name='times' id='times' className='text-black bg-transparent font-bold'>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
-                    <option value={"anually"}>Annually</option>
                 </select>
             </div>
             <ProgressChart/>

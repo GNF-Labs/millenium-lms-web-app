@@ -7,7 +7,6 @@ interface DashboardState {
     statistics: {
         coursesCompleted: number,
         coursesInProgress: number,
-        learningHours: {date: string, hours: number}[]
     }
 }
 
@@ -18,14 +17,19 @@ export const DashboardInitState: DashboardState = {
     statistics: {
         coursesCompleted: 0,
         coursesInProgress: 0,
-        learningHours: []
     }
 }
 
-type Action = {type: any, payload: any}
+type Action = {type: 'SET_ALL_DATA', payload: DashboardState} 
+| {type: 'SET_RECOMMENDED_COURSES', payload: any}
+| {type: 'SET_NEWEST_COURSES', payload: any}
+| {type: 'SET_LAST_COURSE', payload: any}
+| {type: 'SET_STATISTICS', payload: any}
 
 export const DashboardReducer = (state: DashboardState, action: Action) => {
     switch (action.type) {
+        case 'SET_ALL_DATA':
+            return {...state, ...action.payload}
         case 'SET_RECOMMENDED_COURSES':
             return {...state, recommendedCourses: action.payload}
         case 'SET_NEWEST_COURSES':
