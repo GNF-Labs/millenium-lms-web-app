@@ -15,7 +15,7 @@ import { FaStar } from "react-icons/fa";
  * @returns
  */
 export default function Course({ params }: { params: { courseId: number } }) {
-    const [selectedTab, setSelectedTab] = useState("Content")
+    const [selectedTab, setSelectedTab] = useState("Course Info")
     const [enrolled, setEnrolled] = useState(false)
     const [dbCourse, setDbCourse] = useState<any>(null)
     const fetchCourseData = async () => {
@@ -46,7 +46,7 @@ export default function Course({ params }: { params: { courseId: number } }) {
     // const course = courses.find((course) => course.id === params.courseId)
 
 
-    const tabOptions = ["Content", "Course Info", "Reviews", "Announcements"]
+    const tabOptions = ["Course Info", "Course Contents"]
     const changeTab = (selectedOption: string) => { setSelectedTab(selectedOption) }
 
     const renderOverview = () => {
@@ -91,7 +91,7 @@ export default function Course({ params }: { params: { courseId: number } }) {
     }
     const renderTabContent = () => {
         switch(selectedTab) {
-            case "Content":
+            case "Course Contents":
                 return (
                     <div className="space-y-4">
                     <Accordion 
@@ -151,17 +151,6 @@ export default function Course({ params }: { params: { courseId: number } }) {
             case "Course Info":
                 return (
                     <p>{dbCourse?.description}</p>
-                )
-            case "Reviews":
-                return (
-                    <div className="space-y-4">
-                    <Review name="John Doe" profilePicture="https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" rating={4} reviewText="This course is amazing! I learned a lot from it." />
-                    <Review name="John Doe" profilePicture="https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" rating={4} reviewText="This course is amazing! I learned a lot from it." />
-                    </div>
-                )
-            case "Announcements":
-                return (
-                    <p>{dbCourse?.author}</p>
                 )
             default:
                 return null
