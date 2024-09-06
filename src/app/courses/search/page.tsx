@@ -1,6 +1,7 @@
 "use client";
 
 import Search from "./halaman"
+import { Suspense } from "react";
 
 /**
  * Course Search Screen
@@ -8,6 +9,8 @@ import Search from "./halaman"
  */
 export default function SearchPage() {
     return(
-        <Search />
+        <Suspense>
+            <Search />
+        </Suspense>
     )
 }
