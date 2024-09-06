@@ -6,6 +6,8 @@ import React from 'react'
 import { ImportantButton } from '../buttons/important-button';
 import { FaClock, FaStar } from 'react-icons/fa';
 import Link from 'next/link';
+import { useUserBehaviour } from '@/providers/UserBehaviourProvider';
+import { useAppSelector } from '@/redux/hooks';
 
 interface CourseCardProps {
     /**
@@ -40,8 +42,23 @@ interface CourseCardProps {
 
 export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, authorName, timeEstimated, rating }) => {
     const router = useRouter();
-    const handleButtonClick = (url: any) => {
-        console.log(url)
+    const tokenSelector = useAppSelector((state) => state.jwt)
+
+    const userBehaviourContext = useUserBehaviour();
+    const handleButtonClick = async () => {
+        try {
+            const data = {
+                course_id: id,
+                user_id: Number(tokenSelector.user_id),
+                last_interaction: new Date().toISOString(),
+                viewed: true,
+            };
+            console.log(data)
+            console.log(tokenSelector.token)
+            await userBehaviourContext.updateData(data, tokenSelector.token as string)
+        } catch (error) {
+            console.error(error)
+        }
     }
     return (
         <div className='flex flex-row justify-between items-center background1 py-4 px-8'>
@@ -63,7 +80,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                     {rating}
                 </p>
             </div>
-            <Link href={`/courses/${id}`}>
+            <Link href={`/courses/${id}`} onClick={handleButtonClick}>
                 <ImportantButton text='Lihat' />
             </Link>
 

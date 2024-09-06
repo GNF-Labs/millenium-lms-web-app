@@ -12,8 +12,9 @@ const ClientSideInitializer: React.FC<{onReady: ()=>void}> = ({onReady}) => {
             if (typeof window !== 'undefined') {
                     const username = localStorage.getItem('username') || "guest";
                     const token = localStorage.getItem('token');
+                    const user_id = Number(localStorage.getItem('user_id'));
 
-                dispatch(saveToken({ username, token: token ? token : null }));
+                dispatch(saveToken({ username, token: token ? token : null, user_id: user_id ? user_id : null }));
             }
             setContentLoaded(true);
         };
