@@ -8,4 +8,5 @@ const navigationRoute = [
 
 
 const API_URI = process.env.NEXT_PUBLIC_PROD_API_URL;
-export {navigationRoute, API_URI}
+const MODEL_URI = process.env.NEXT_PUBLIC_MODEL_API_URL;
+export {navigationRoute, API_URI, MODEL_URI}

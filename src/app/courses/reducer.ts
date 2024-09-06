@@ -38,7 +38,7 @@ export function reducer(state: CoursesState, action: Action) {
                 duration: course.duration,
                 rating: course.rating,
                 id: course.id,
-                image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+                image: course.image === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image
             }));
             switch (action.payload.index) {
                 case 1:

@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchProfile } from "@/services/handlers";
 import { CardCarousel } from "@/components/cards/card-carousel";
+import { getRecommendedCourses } from "@/services/course-handlers";
 
 /**
  * Home Screen (For landing page)
@@ -25,16 +26,7 @@ export default function Home() {
     { name: "Profile", route: "/profile" },
   ];
 
-  const courses = [
-    { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
-    { title: "Course 2", author: "Author 2", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
-    { title: "Course 3", author: "Author 3", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 3 },
-    { title: "Course 4", author: "Author 4", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 4 },
-    { title: "Course 5", author: "Author 5", duration: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 5 },
-    { title: "Course 6", author: "Author 6", duration: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 6 },
-    { title: "Course 7", author: "Author 7", duration: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
-    { title: "Course 8", author: "Author 8", duration: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
-  ]
+  const [courses, setCourses] = useState([])
 
   function GoToRegister() {
     router.push("/register");
@@ -52,6 +44,22 @@ export default function Home() {
   const [loggedIn,setLoggedIn] = useState<boolean>(false)
 
 
+  const fetchRecommendedCourse = async () => {
+    const { status, data } = await getRecommendedCourses(tokenSelector.user_id ?? 1,1);
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    console.log(data.image_url);
+    const courses = data["data"].map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
   useEffect(() => {
     const req = async () => {
         try {
@@ -60,6 +68,7 @@ export default function Home() {
                 setLoggedIn(false)
             } else {
                 setLoggedIn(true)
+                setCourses(await fetchRecommendedCourse())
             }
         } catch (error) {
             

@@ -13,6 +13,10 @@ import ChapterCard from "@/components/cards/chapter-card";
 import { useAppSelector } from "@/redux/hooks";
 import { useUserBehaviour } from "@/providers/UserBehaviourProvider";
 import { useRouter } from "next/navigation";
+import { fetchCourses } from "@/services/handlers";
+import { getRecommendedCourses } from "@/services/course-handlers";
+import { CardCarousel } from "@/components/cards/card-carousel";
+import { fetchProfile } from "@/services/handlers";
 
 /**
  * Course Screen
@@ -23,10 +27,43 @@ export default function Course({ params }: { params: { courseId: number } }) {
   const [enrolled, setEnrolled] = useState(false)
   const [dbCourse, setDbCourse] = useState<any>(null)
   const [interactions, setInteractions] = useState<any>(null)
+  const [recommendedcourses, setRecommendedCourses] = useState<any>([])
   const tokenSelector = useAppSelector((state) => state.jwt)
   const userBehaviourContext = useUserBehaviour();
-
   const router = useRouter();
+
+  const fetchCourse = async () => {
+    const { status, data } = await fetchCourses();
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    console.log("fetch default:" + data);
+    const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
+  const fetchRecommendedCourse = async () => {
+    const { status, data } = await getRecommendedCourses(tokenSelector.user_id ?? 1,params.courseId % 17);
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    console.log("fetch recommended:" + data);
+    const courses = data["data"].map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -62,6 +99,14 @@ export default function Course({ params }: { params: { courseId: number } }) {
       setInteractions(interactions);
       console.log(dbCourse);
       console.log(interactions);
+      const profileResponse = await fetchProfile(tokenSelector.username, tokenSelector.token || "")
+
+      // Handle profile response
+      if (profileResponse.status === 403 || profileResponse.status === 401) {
+        setRecommendedCourses(await fetchCourse())
+      } else {
+        setRecommendedCourses(await fetchRecommendedCourse())
+      }
     };
     init();
   }, [params.courseId, tokenSelector.token, tokenSelector.username]);
@@ -174,6 +219,8 @@ export default function Course({ params }: { params: { courseId: number } }) {
           <div className="py-2" />
           <Tabs options={tabOptions} onSelectTab={changeTab} />
           <div className="p-4 backdrop-blur-md bg-[rgba(255,254,254,0.73)] rounded-b-2xl">{renderTabContent()}</div>
+        <div className="py-4" />
+        <CardCarousel title="Other Recommended Courses" courses={recommendedcourses} />
         </div>
 
       </main>

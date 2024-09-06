@@ -8,9 +8,11 @@ import NavigationBar from "@/components/navbar/navigation-bar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect , useReducer } from "react";
 import { fetchCourses } from "@/services/handlers";
-import { getCoursesByCategory } from "@/services/course-handlers";
+import { getCoursesByCategory, getRecommendedCourses } from "@/services/course-handlers";
 import { initialState, reducer } from "./reducer";
 import { CardCarousel } from "@/components/cards/card-carousel";
+import { useAppSelector } from "@/redux/hooks";
+import { fetchProfile } from "@/services/handlers";
 
 /**
  * Courses Screen
@@ -19,6 +21,7 @@ import { CardCarousel } from "@/components/cards/card-carousel";
 export default function Courses() {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const tokenSelector = useAppSelector((state) => state.jwt)
 
   const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,13 +33,29 @@ export default function Courses() {
     router.push("/courses/search?" + searchParams.toString());
   }
 
-  const fetchCourseData = async () => {
+  const fetchCourse = async () => {
     const { status, data } = await fetchCourses();
     if (status !== 200) {
       console.error(`Error fetching courses: ${data}`);
       return [];
     }
     const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
+  const fetchRecommendedCourse = async () => {
+    const { status, data } = await getRecommendedCourses(tokenSelector.user_id ?? 1,1);
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    console.log(data.image_url);
+    const courses = data["data"].map((course: any) => ({
       title: course.name,
       duration: course.time_estimated,
       rating: course.rating,
@@ -52,7 +71,7 @@ export default function Courses() {
       console.error(`Error fetching courses: ${data}`);
       return [];
     }
-    const courses = data.map((course: any) => ({
+    const courses = data["courses"].map((course: any) => ({
       title: course.name,
       duration: course.time_estimated,
       rating: course.rating,
@@ -65,7 +84,14 @@ export default function Courses() {
 
   useEffect(() => {
     const init = async () => {
-      dispatch({type: 'SET_COURSES', payload: {courses: await fetchCourseData()}})
+      const profileResponse = await fetchProfile(tokenSelector.username, tokenSelector.token || "")
+
+      // Handle profile response
+      if (profileResponse.status === 403 || profileResponse.status === 401) {
+        dispatch({type: 'SET_COURSES', payload: {courses: await fetchCourse()}})
+      } else {
+        dispatch({type: 'SET_COURSES', payload: {courses: await fetchRecommendedCourse()}})
+      }
       dispatch({type: 'SET_COURSES', payload: {index:1, courses: await fetchCourseByCategory(1)}})
       dispatch({type: 'SET_COURSES', payload: {index:2, courses: await fetchCourseByCategory(2)}})
       dispatch({type: 'SET_COURSES', payload: {index:3, courses: await fetchCourseByCategory(3)}})
@@ -105,9 +131,9 @@ export default function Courses() {
           <div className="space-y-8">
             <CardCarousel title="Recommended For You" courses={state.recommendedCourses} />
             <CardCarousel title="Programming" courses={state.category1Courses} />
-            <CardCarousel title="Security" courses={state.category2Courses} />
             <CardCarousel title="Data Science/AI" courses={state.category3Courses} />
             <CardCarousel title="Software Development" courses={state.category5Courses} />
+            <CardCarousel title="Security" courses={state.category2Courses} />
             <CardCarousel title="Others" courses={state.category4Courses} />
           </div>}
 
