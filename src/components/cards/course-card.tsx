@@ -1,6 +1,9 @@
 import { FaStar } from 'react-icons/fa';
 import Link from 'next/link'
 import Image from 'next/image';
+import { useContext } from 'react';
+import { UserBehaviourContext, useUserBehaviour } from '@/providers/UserBehaviourProvider';
+import { useAppSelector } from '@/redux/hooks';
 
 export interface CourseCardProps {
     /**
@@ -40,8 +43,26 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration =
     // }
     durationText = `${duration} Jam`;
 
+    const tokenSelector = useAppSelector((state) => state.jwt)
+
+    const userBehaviourContext = useUserBehaviour();
+
+    const updateInteraction = async () => {
+        try {
+
+            await userBehaviourContext.updateData({
+                course_id: id,
+                user_id: Number(tokenSelector.user_id),
+                last_interaction: new Date(),
+                viewed: true,
+            }, tokenSelector.token as string)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
-        <Link href={`/courses/${id}`} className=''>
+        <Link href={`/courses/${id}`} onClick={() => updateInteraction()} className=''>
             <div className="flex flex-col backdrop-blur-sm bg-[rgba(255,254,254,0.73)] rounded-[15px] min-h-60 shadow-md shadow-slate-600 hover:shadow-lg hover:shadow-slate-600 hover:-translate-y-0.5 transition-all h-full w-full">
                 <div className='h-1/2 relative'>
                     {/* <img src={image ?? ""} alt={title} className="rounded-t-[15px] object-cover h-full w-full"/> */}

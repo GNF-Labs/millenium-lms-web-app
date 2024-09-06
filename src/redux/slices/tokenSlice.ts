@@ -25,10 +25,12 @@ export const tokenSlice = createSlice({
             state.user_id = action.payload.user_id;
             localStorage.setItem('username', state.username);
             localStorage.setItem('token', state.token || '');
+            localStorage.setItem('user_id', state.user_id?.toString() || '');
         },
         deleteToken: (state)=> {
             localStorage.removeItem('username');
             localStorage.removeItem('token');
+            localStorage.removeItem('user_id');
             state.username = 'guest';
             state.token = null;
             state.user_id = null;

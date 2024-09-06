@@ -8,7 +8,7 @@ import Head from 'next/head'
 import { CourseCard } from '@/components/menus/dashboard-courses-menu'
 import { ImportantButton, ImportantButton2 } from '@/components/buttons/important-button'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { fetchProfile, handleUpdateProfile } from '@/services/handlers'
+import { fetchCourseOfUsers, fetchProfile, handleUpdateProfile } from '@/services/handlers'
 import { useRouter } from 'next/navigation'
 import { readImage } from '@/services/mega'
 import { deleteToken } from '@/redux/slices/tokenSlice'
@@ -55,6 +55,8 @@ const ProfilePage = () => {
     const [fullName, setFullName] = useState(profileState.profile?.full_name || ''); // Local state for the form inputs
     const [about, setAbout] = useState(profileState.profile?.about || '');
     const [editAvatar, setEditAvatar] = useState(profileState?.profile?.image_url || null)
+
+    const [enrolledCourse, setEnrolledCourse] = useState<any[]>([]);
 
     const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFullName(e.target.value);
@@ -133,7 +135,7 @@ const ProfilePage = () => {
             profileDispatch({ type: 'FETCH_INIT' });
             try {
                 const { status, data } = await fetchProfile(tokenSelector.username, tokenSelector.token || "");
-
+                
                 if (status === 403) {
                     router.push("/login");
                     return;
@@ -147,6 +149,11 @@ const ProfilePage = () => {
                 setFullName(data.full_name);
                 setAbout(data.about);
                 setImageLoading(false);
+
+                const {status: courseStatus, data: courseData} = await fetchCourseOfUsers(data.id, tokenSelector.token || "");
+                if (courseStatus === 200) {
+                    setEnrolledCourse(courseData);
+                }
             } catch (error) {
                 profileDispatch({ type: 'FETCH_FAILURE', payload: (error as Error).message });
             } finally {
@@ -241,7 +248,7 @@ const ProfilePage = () => {
                             <h1>Kursus Terkini</h1>
                             <div className='h-4' />
                             <div className='flex flex-col space-y-4'>
-                                {coursesList.map((item, index) => (
+                                {enrolledCourse.map((item:any, index:any) => (
                                     <CourseCard id={item.id} key={index} logoSource={item.src} name={item.name} authorName={item.authorName} timeEstimated={item.timeEstimated} rating={item.rating} />
                                 ))}
                             </div>
