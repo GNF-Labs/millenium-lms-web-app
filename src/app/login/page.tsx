@@ -36,7 +36,7 @@ export default function Login() {
     }
     
     // set the token and username
-    tokenDispatch(saveToken({username: data.username, token:data.token}))
+    tokenDispatch(saveToken({username: data.username, token:data.token, user_id: data.user_id}))
 
     router.push("/dashboard");
     console.log(state);

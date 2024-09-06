@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import RectAccordion from '@/components/accordion/rect-accordion';
 
 // Mock data: replace this with real API calls.
 const mockChapters = [
@@ -23,53 +23,6 @@ const mockChapters = [
   },
 ];
 
-const Accordion = ({
-    title,
-    children,
-    isOpen,
-    toggleAccordion,
-  }: {
-    title: string;
-    children: React.ReactNode;
-    isOpen: boolean;
-    toggleAccordion: () => void;
-  }) => {
-    const [height, setHeight] = useState<string>('0px');
-    const contentRef = useRef<HTMLDivElement>(null);
-  
-    // Calculate the content's height to animate between open/closed states
-    useEffect(() => {
-      if (contentRef.current) {
-        if (isOpen) {
-          setHeight(`${contentRef.current.scrollHeight}px`);
-        } else {
-          setHeight('0px');
-        }
-      }
-    }, [isOpen]);
-  
-    return (
-      <div>
-        <button
-          onClick={toggleAccordion}
-          className="flex justify-between w-full p-4 backdrop-blur-md bg-[#229cda] hover:bg-[#2291c9] text-left"
-        >
-          <span>{title}</span>
-          <span>{isOpen ? '-' : '+'}</span>
-        </button>
-  
-        {/* Animated content wrapper */}
-        <div
-          ref={contentRef}
-          style={{ maxHeight: height }}
-          className="overflow-hidden transition-all duration-300 ease-in-out"
-        >
-          <div className="backdrop-blur-md">{children}</div>
-        </div>
-      </div>
-    );
-  };
-
 // Component for a list of chapters with subchapter accordions
 const ChapterList = ({ courseId, currentChapterId, currentSubchapterId, }: {
   courseId: number;
@@ -86,7 +39,7 @@ const ChapterList = ({ courseId, currentChapterId, currentSubchapterId, }: {
   return (
     <div className="w-1/4 h-full backdrop-blur-md bg-[rgba(200,200,200,0.73)]">
       {mockChapters.map((chapter) => (
-        <Accordion
+        <RectAccordion
           key={chapter.id}
           title={chapter.name}
           isOpen={openChapter === chapter.id}
@@ -109,7 +62,7 @@ const ChapterList = ({ courseId, currentChapterId, currentSubchapterId, }: {
                     </button>
                 ))}
             </div>
-        </Accordion>
+        </RectAccordion>
       ))}
     </div>
   );
@@ -143,7 +96,7 @@ export default function CourseContent({ params }: { params: { courseId: number, 
                     />
                     <div className="w-3/4 p-6 bg-white border-l border-gray-200">
                         <h1 className="text-xl font-bold mb-4">Subchapter {params.subchapterId}</h1>
-                        <p>{subchapterContent}</p>
+                        <p>{`Content for course ${params.courseId}, chapter ${params.chapterId}, subchapter ${params.subchapterId}`}</p>
                     </div>
                 </div>
 
