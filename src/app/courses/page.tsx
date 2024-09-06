@@ -5,12 +5,12 @@ import { Poppins } from "next/font/google";
 import { poppins } from "../fonts";
 import { navigationRoute } from "../constants";
 import NavigationBar from "@/components/navbar/navigation-bar";
-import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
-import { CourseCard } from "@/components/cards/course-card";
-import { CardCarousel } from "@/components/cards/card-carousel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect , useReducer } from "react";
 import { fetchCourses } from "@/services/handlers";
+import { getCoursesByCategory } from "@/services/course-handlers";
+import { initialState, reducer } from "./reducer";
+import { CardCarousel } from "@/components/cards/card-carousel";
 
 /**
  * Courses Screen
@@ -18,16 +18,14 @@ import { fetchCourses } from "@/services/handlers";
  */
 export default function Courses() {
   const router = useRouter();
-  const [courseState, setCourseState] = useState([]);
-  const [load, setLoad] = useState(false);
-  const [search, setSearch] = useState("");
-  const [allDataLoaded, setAllDataLoaded] = useState(true);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(search === "") {return;}
+    if(state.search === "") {return;}
     const searchParams = new URLSearchParams();
     searchParams.set("page", "1");
-    searchParams.set("q", search);
+    searchParams.set("q", state.search);
     console.log(searchParams.toString());
     router.push("/courses/search?" + searchParams.toString());
   }
@@ -43,35 +41,40 @@ export default function Courses() {
       duration: course.time_estimated,
       rating: course.rating,
       id: course.id,
-      author: "m",
-      image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
     }));
     return courses;
   }
+
+  const fetchCourseByCategory = async (categoryID:number) => {
+    const { status, data } = await getCoursesByCategory(categoryID);
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
+
+
   useEffect(() => {
     const init = async () => {
-      const dbCourses = await fetchCourseData();
-      setCourseState(dbCourses);
-      setLoad(true);
+      dispatch({type: 'SET_COURSES', payload: {courses: await fetchCourseData()}})
+      dispatch({type: 'SET_COURSES', payload: {index:1, courses: await fetchCourseByCategory(1)}})
+      dispatch({type: 'SET_COURSES', payload: {index:2, courses: await fetchCourseByCategory(2)}})
+      dispatch({type: 'SET_COURSES', payload: {index:3, courses: await fetchCourseByCategory(3)}})
+      dispatch({type: 'SET_COURSES', payload: {index:4, courses: await fetchCourseByCategory(4)}})
+      dispatch({type: 'SET_COURSES', payload: {index:5, courses: await fetchCourseByCategory(5)}})
+      dispatch({type: 'SET_LOAD', payload: true});
     };
     init();
   },[]);
-  
-  const courses = [
-    { title: "Course 1 asdfjahsdfjha  asdfasdf", author: "Author 1", time_estimated: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 1 },
-    { title: "Course 2", author: "Author 2", time_estimated: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 2 },
-    { title: "Course 3", author: "Author 3", time_estimated: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 3 },
-    { title: "Course 4", author: "Author 4", time_estimated: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 4 },
-    { title: "Course 5", author: "Author 5", time_estimated: 120, rating: 4.5, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 5 },
-    { title: "Course 6", author: "Author 6", time_estimated: 90, rating: 4.2, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 6 },
-    { title: "Course 7", author: "Author 7", time_estimated: 150, rating: 4.7, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 7 },
-    { title: "Course 8", author: "Author 8", time_estimated: 180, rating: 4.9, image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg", id: 8 },
-  ]
-  if(!load){
-    return
-  }
-  console.log(courseState);
-  console.log(courses);
 
   return (
     <>
@@ -89,7 +92,7 @@ export default function Courses() {
             <form onSubmit={SearchCourses} className="flex items-center mb-8 w-1/3">
               <input type="text" 
                 placeholder="Search"
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => dispatch({type: 'SET_SEARCH', payload: e.target.value})}
                 className="w-full px-4 py-2 border-2 border-blue-600 rounded-s-md focus:outline-none focus:border-2 focus:border-blue-800" />
               <button 
                 type="submit"
@@ -98,12 +101,15 @@ export default function Courses() {
             </form>
           </div>
         </div>
-        <div className="space-y-8">
-          <CardCarousel title="Recommended For You" courses={courseState} />
-          <CardCarousel title="Web Development" courses={courses} />
-          <CardCarousel title="Mobile Development" courses={courses} />
-          <CardCarousel title="Data Science" courses={courses} />
-        </div>
+        {state.load &&
+          <div className="space-y-8">
+            <CardCarousel title="Recommended For You" courses={state.recommendedCourses} />
+            <CardCarousel title="Programming" courses={state.category1Courses} />
+            <CardCarousel title="Security" courses={state.category2Courses} />
+            <CardCarousel title="Data Science/AI" courses={state.category3Courses} />
+            <CardCarousel title="Software Development" courses={state.category5Courses} />
+            <CardCarousel title="Others" courses={state.category4Courses} />
+          </div>}
 
       </main>
     </>

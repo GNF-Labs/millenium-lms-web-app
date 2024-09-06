@@ -50,8 +50,7 @@ export default function Courses() {
             duration: course.time_estimated,
             rating: course.rating,
             id: course.id,
-            author: "m",
-            image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+            image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
         }))
         return courses;
     }
@@ -121,7 +120,7 @@ export default function Courses() {
                 <div className="grid grid-cols-5 gap-x-4">
                 {load ? courseState.map((course,index) => (
                         <div key={index} className="flex-shrink-0 w-full pt-1 pb-5">
-                            <CourseCard title={course.title} author={course.author} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
+                            <CourseCard title={course.title} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
                         </div>
                 )): null}
                 </div>

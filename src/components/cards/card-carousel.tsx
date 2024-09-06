@@ -10,7 +10,7 @@ interface CardCarouselProps {
     /**
      * The list of courses to be displayed in the carousel
      */
-    courses: CourseCardProps[];
+    courses: CourseCardProps[] | null;
 }
 
 const CardCarousel: React.FC<CardCarouselProps> = ({ title, courses }) => {
@@ -40,9 +40,9 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ title, courses }) => {
             </button>
           </div>
           <div ref={carouselRef} className="flex overflow-x-hidden carousel w-full gap-x-[2.5%]">
-              {courses.map((course, index) => (
+              {(courses ?? []).map((course, index) => (
               <div key={index} className="flex-shrink-0 h-auto w-[23%] pt-1 pb-5">
-                  <CourseCard title={course.title} author={course.author ?? undefined} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
+                  <CourseCard title={course.title} duration={course.duration} rating={course.rating} image={course.image} id={course.id} />
               </div>
               ))}
           </div>

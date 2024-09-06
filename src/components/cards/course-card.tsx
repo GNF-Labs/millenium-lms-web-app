@@ -8,10 +8,6 @@ export interface CourseCardProps {
      */
     title: string;
     /**
-     * The author of the course
-     */
-    author?: string;
-    /**
      * The duration of the course (in minutes)
      */
     duration?: number;
@@ -22,14 +18,14 @@ export interface CourseCardProps {
     /**
      * The URL of the course image
      */
-    image?: string;
+    image: string;
     /**
      * The id of the course
      */
     id: number;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration = 100, rating, image, id }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ title, duration = 100, rating, image, id }) => {
     let durationText;
     // if (duration % 60 === 0) {
     //     durationText = `${duration / 60} hour${duration / 60 > 1 ? 's' : ''}`;
@@ -46,7 +42,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration =
                 <div className='h-1/2 relative'>
                     {/* <img src={image ?? ""} alt={title} className="rounded-t-[15px] object-cover h-full w-full"/> */}
                     <Image
-                        src={image ?? ""}
+                        src={image}
                         alt={title}
                         layout="fill"
                         objectFit="cover"
@@ -58,7 +54,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, author = "m", duration =
                 </div>
                 <div className="flex flex-col px-3 py-2 justify-between h-1/2">
                     <div>
-                        <p className="text-xs text-gray-700">{author}</p>
                         <p className="font-extrabold text-lg text-black line-clamp-2">{title}</p>
                     </div>
                     <div className="flex flex-row justify-between text-sm">

@@ -7,10 +7,23 @@ export const getCourses = async () => {
 
         return {
             status: response.status,
-            data: response.data
+            data: response.data["courses"]
         }
     } catch(error: any) {
         throw new Error(`Error while getting courses. ${error}`)
+    }
+}
+
+export const getCoursesByCategory = async (categoryID: number) => {
+    try {
+        const response = await axios.get(`${API_URI}/courses?category=${categoryID}`);
+        console.log(response.data["courses"])
+        return {
+            status: response.status,
+            data: response.data["courses"]
+        }
+    } catch(error: any) {
+        throw new Error(`Error while getting courses by category. ${error}`)
     }
 }
 

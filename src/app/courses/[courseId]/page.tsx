@@ -30,8 +30,7 @@ export default function Course({ params }: { params: { courseId: number } }) {
         rating: data.rating,
         id: data.id,
         description: data.description,
-        author: "m",
-        image: "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg"
+        image: data.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : data.image_url
       };
       return course;
     }
