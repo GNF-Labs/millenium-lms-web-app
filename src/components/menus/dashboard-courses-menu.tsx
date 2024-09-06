@@ -63,7 +63,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ id, logoSource, name, au
                     {rating}
                 </p>
             </div>
-            <ImportantButton text='Lihat' onClick={() => { console.log("masa ini error sih?") }} />
+            <Link href={`/courses/${id}`}>
+                <ImportantButton text='Lihat' />
+            </Link>
 
         </div>
     )
@@ -108,9 +110,6 @@ export const DashboardCoursesMenu = () => {
             <div className='flex flex-row space-x-8'>
                 <button>
                     <p className='font-bold hover:bg-gray-50/30'>Rekomendasi</p>
-                </button>
-                <button>
-                    <p className='font-bold hover:bg-gray-50/30'>Terbaru</p>
                 </button>
             </div>
             <div className='flex flex-row space-x-8'>
