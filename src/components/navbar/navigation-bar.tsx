@@ -6,6 +6,8 @@ import { redirect, useRouter } from 'next/navigation'
 import { API_URI } from '@/app/constants'
 import store from '@/redux/store'
 import { getToken, deleteToken } from '@/redux/slices/tokenSlice'
+import { fetchProfile } from '@/services/handlers'
+import { errorMonitor } from 'node:events'
 
 interface NavigationBarProps {
   /**
@@ -66,7 +68,7 @@ const TheLink: FC<TheLinkProps> = ({ name, route, style, onClick }) => {
   return (
     <Link style={style} className='font-bold lg:text-[20px] sm:text-sm' href={route}>
       <p>{name}</p>
-      
+
     </Link>
   )
 }
@@ -79,6 +81,8 @@ interface AccountDropdownProps {
 const AccountDropdown: FC<AccountDropdownProps> = ({ profileClick, logoutClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const tokenSelector = useAppSelector((state) => state.jwt)
+  const [profileImage, setProfileImage] = useState("");
 
   // Close the dropdown if the user clicks outside of it
   useEffect(() => {
@@ -93,24 +97,46 @@ const AccountDropdown: FC<AccountDropdownProps> = ({ profileClick, logoutClick }
     };
   }, [dropdownRef]);
 
+  useEffect(() => {
+    const init = async () => {
+      try {
+
+        const { status, data } = await fetchProfile(tokenSelector.username, tokenSelector.token as string)
+        if (status !== 200) {
+          console.error(data);
+          return;
+        }
+
+        setProfileImage(data?.image_url);
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    init()
+  }, [tokenSelector])
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         className="flex items-center space-x-2 focus:outline-none"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <img
-          src="https://via.placeholder.com/40"
-          alt="Profile"
-          className="w-10 h-10 rounded-full"
-        />
+        <div className="rounded-full w-10 h-10 overflow-hidden">
+          <Image
+            src={profileImage !== "" ? profileImage : "https://via.placeholder.com/40"}
+            alt="Profile"
+            className="rounded-full object-cover"
+            width={40}
+            height={40}
+
+          />
+        </div>
       </button>
       <div
-        className={`absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg transition-transform duration-300 ease-out transform ${
-          isOpen
-            ? 'opacity-100 scale-100'
-            : 'opacity-0 scale-95 pointer-events-none'
-        }`}
+        className={`absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg transition-transform duration-300 ease-out transform ${isOpen
+          ? 'opacity-100 scale-100'
+          : 'opacity-0 scale-95 pointer-events-none'
+          }`}
       >
         <ul className="py-1 text-gray-700">
           <li>
@@ -146,6 +172,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
     const handleStateChange = () => {
       const state = getToken(store.getState());
       console.log('Token changed:', state); // Log the updated jwt state
+
+
     };
 
     // Subscribe to the store
@@ -157,11 +185,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ logo, navigationMenu = na
     };
   }, []);
 
+
   const handleLogout = () => {
     dispatch(deleteToken());
     router.push("/");
   }
-  
+
   const handleProfileClick = async (e: React.MouseEvent) => {
     if (!tokenSelector.token) {
       router.push("/login");
