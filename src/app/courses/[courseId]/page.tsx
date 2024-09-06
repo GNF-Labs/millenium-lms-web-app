@@ -12,6 +12,7 @@ import { FaStar } from "react-icons/fa";
 import ChapterCard from "@/components/cards/chapter-card";
 import { useAppSelector } from "@/redux/hooks";
 import { useUserBehaviour } from "@/providers/UserBehaviourProvider";
+import { useRouter } from "next/navigation";
 
 /**
  * Course Screen
@@ -24,6 +25,8 @@ export default function Course({ params }: { params: { courseId: number } }) {
   const [interactions, setInteractions] = useState<any>(null)
   const tokenSelector = useAppSelector((state) => state.jwt)
   const userBehaviourContext = useUserBehaviour();
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -77,6 +80,7 @@ export default function Course({ params }: { params: { courseId: number } }) {
       await userBehaviourContext.updateData(data, tokenSelector.token as string)
 
       console.log("course enrolled")
+      window.location.reload()
     } catch (error) {
       console.error(error)
     }
@@ -117,9 +121,11 @@ export default function Course({ params }: { params: { courseId: number } }) {
             <p className="pl-1">{dbCourse !== null ? dbCourse.rating : "-"}</p>
           </span>
           <div className="h-10" />
-          <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors" onClick={handleEnroll} >
+          {interactions?.registered ? <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors" onClick={()=>router.push("/courses/" + params.courseId + "/1/1")} >
+            Buka Course
+          </button> : <button className="w-full h-12 bg-[rgba(0,168,225,1)] text-white text-[16px] font-thin rounded-xl hover:bg-[rgb(2,110,148)] transition-colors" onClick={handleEnroll} >
             Enroll Course
-          </button>
+          </button>}
         </div>
       )
     }

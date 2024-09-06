@@ -39,7 +39,7 @@ const Dashboard = () => {
                 } else {
                     setUserData(profileResponse.data);
                 }
-
+                console.log(dashboardResponse.data);
                 // Handle dashboard response
                 if (dashboardResponse.status === 403 || dashboardResponse.status === 401) {
                     router.push("/login");
@@ -49,6 +49,8 @@ const Dashboard = () => {
                         type: 'SET_ALL_DATA',
                         payload: {
                             ...DashboardInitState,
+                            lastCourse: dashboardResponse.data.latest_course_name,
+                            completionRate: dashboardResponse.data.completion_rate,
                             statistics: {
                                 coursesCompleted: dashboardResponse.data.completed_courses,
                                 coursesInProgress: dashboardResponse.data.in_progress_courses
@@ -98,11 +100,10 @@ const Dashboard = () => {
                                                 width={30}
                                             />
                                             <div className='flex flex-col justify-center'>
-                                                <h2 className='font-bold text-[14px]'>Python</h2>
-                                                <p className='text-[12px]'>By Hoshino</p>
+                                                <h2 className='font-bold text-[14px]'>{dashboardState.lastCourse}</h2>
                                             </div>
                                             <p>
-                                                73 %
+                                                {dashboardState.completionRate}%
                                             </p>
                                         </div>
 
@@ -115,7 +116,7 @@ const Dashboard = () => {
 
                             </div>
                             <div className='flex flex-col flex-grow-0 flex-shrink-[2] space-y-8'>
-                                <SearchTextInput />
+                                <SearchTextInput/>
                                 <div className='flex flex-row justify-between space-x-6'>
                                     <div className='flex flex-row background1 justify-center items-center'>
                                         <div className='p-4'>

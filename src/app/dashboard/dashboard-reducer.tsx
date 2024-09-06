@@ -4,6 +4,7 @@ interface DashboardState {
     recommendedCourses: any
     newestCourses: any
     lastCourse: any
+    completionRate: any
     statistics: {
         coursesCompleted: number,
         coursesInProgress: number,
@@ -14,6 +15,7 @@ export const DashboardInitState: DashboardState = {
     recommendedCourses: [],
     newestCourses: [],
     lastCourse: {},
+    completionRate: 0,
     statistics: {
         coursesCompleted: 0,
         coursesInProgress: 0,
