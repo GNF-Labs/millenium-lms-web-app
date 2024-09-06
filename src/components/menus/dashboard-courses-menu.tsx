@@ -111,9 +111,6 @@ export const DashboardCoursesMenu = () => {
                 <button>
                     <p className='font-bold hover:bg-gray-50/30'>Rekomendasi</p>
                 </button>
-                <button>
-                    <p className='font-bold hover:bg-gray-50/30'>Terbaru</p>
-                </button>
             </div>
             <div className='flex flex-row space-x-8'>
                 <div className='flex flex-col space-y-4 w-full'>
