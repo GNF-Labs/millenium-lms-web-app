@@ -56,6 +56,31 @@ export const fetchCourses = async () => {
   }
 }
 
+export const fetchOnDemandCourses = async () => {
+  try {
+    const response = await axios.get(`${API_URI}/courses-ondemand`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    });
+
+    return {
+      status: response.status,
+      data: response.data["courses"],
+    };
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        status: error.response.status,
+        data: error.response.data,
+      };
+    }
+    throw new Error(`Error fetching on demand courses: ${error.message}`);
+
+  }
+}
+
 export const fetchCourseById = async (id:number) => {
   try {
     const response = await axios.get(`${API_URI}/courses/${id}`, {

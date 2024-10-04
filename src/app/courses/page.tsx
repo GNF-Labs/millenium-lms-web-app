@@ -7,7 +7,7 @@ import { navigationRoute } from "../constants";
 import NavigationBar from "@/components/navbar/navigation-bar";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect , useReducer } from "react";
-import { fetchCourses } from "@/services/handlers";
+import { fetchCourses, fetchOnDemandCourses } from "@/services/handlers";
 import { getCoursesByCategory, getRecommendedCourses } from "@/services/course-handlers";
 import { initialState, reducer } from "./reducer";
 import { CardCarousel } from "@/components/cards/card-carousel";
@@ -35,6 +35,21 @@ export default function Courses() {
 
   const fetchCourse = async () => {
     const { status, data } = await fetchCourses();
+    if (status !== 200) {
+      console.error(`Error fetching courses: ${data}`);
+      return [];
+    }
+    const courses = data.map((course: any) => ({
+      title: course.name,
+      duration: course.time_estimated,
+      rating: course.rating,
+      id: course.id,
+      image: course.image_url === "" ? "https://cms-assets.themuse.com/media/lead/01212022-1047259374-coding-classes_scanrail.jpg" : course.image_url
+    }));
+    return courses;
+  }
+  const fetchOnDemandCourse = async () => {
+    const { status, data } = await fetchOnDemandCourses();
     if (status !== 200) {
       console.error(`Error fetching courses: ${data}`);
       return [];
@@ -97,6 +112,7 @@ export default function Courses() {
       dispatch({type: 'SET_COURSES', payload: {index:3, courses: await fetchCourseByCategory(3)}})
       dispatch({type: 'SET_COURSES', payload: {index:4, courses: await fetchCourseByCategory(4)}})
       dispatch({type: 'SET_COURSES', payload: {index:5, courses: await fetchCourseByCategory(5)}})
+      dispatch({type: 'SET_COURSES', payload: {index:6, courses: await fetchOnDemandCourse()}})
       dispatch({type: 'SET_LOAD', payload: true});
     };
     init();
@@ -130,6 +146,7 @@ export default function Courses() {
         {state.load &&
           <div className="space-y-8">
             <CardCarousel title="Recommended For You" courses={state.recommendedCourses} />
+            <CardCarousel title="Popular Courses" courses={state.onDemandCourses} />
             <CardCarousel title="Programming" courses={state.category1Courses} />
             <CardCarousel title="Data Science/AI" courses={state.category3Courses} />
             <CardCarousel title="Software Development" courses={state.category5Courses} />

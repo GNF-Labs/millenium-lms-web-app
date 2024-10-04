@@ -2,6 +2,7 @@ import { CourseCardProps } from "@/components/cards/course-card";
 
 export interface CoursesState {
     recommendedCourses: CourseCardProps[] | null;
+    onDemandCourses: CourseCardProps[] | null;
     category1Courses: CourseCardProps[] | null;
     category2Courses: CourseCardProps[] | null;
     category3Courses: CourseCardProps[] | null;
@@ -14,6 +15,7 @@ export interface CoursesState {
 
 export const initialState: CoursesState = {
     recommendedCourses: null,
+    onDemandCourses: null,
     category1Courses: null,
     category2Courses: null,
     category3Courses: null,
@@ -51,6 +53,8 @@ export function reducer(state: CoursesState, action: Action) {
                     return {...state, category4Courses:courses}
                 case 5:
                     return {...state, category5Courses:courses}
+                case 6:
+                    return {...state, onDemandCourses:courses}
                 default:
                     return {...state, recommendedCourses:courses}
             }
