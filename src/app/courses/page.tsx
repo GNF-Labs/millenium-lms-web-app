@@ -21,6 +21,7 @@ import { fetchProfile } from "@/services/handlers";
 export default function Courses() {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
+  // const [profileResponse, setProfileResponse] = useState({status: null,data: null})
   const tokenSelector = useAppSelector((state) => state.jwt)
 
   const SearchCourses = (e: React.FormEvent<HTMLFormElement>) => {
@@ -95,29 +96,30 @@ export default function Courses() {
     }));
     return courses;
   }
-
-
+  
   useEffect(() => {
     const init = async () => {
       const profileResponse = await fetchProfile(tokenSelector.username, tokenSelector.token || "")
-
+      
+      console.log("loop on" + profileResponse.status)
       // Handle profile response
-      if (profileResponse.status === 403 || profileResponse.status === 401) {
+      if (profileResponse.status !== 200) {
         dispatch({type: 'SET_COURSES', payload: {courses: await fetchCourse()}})
       } else {
         dispatch({type: 'SET_COURSES', payload: {courses: await fetchRecommendedCourse()}})
+        console.log("get recommended")
       }
+      dispatch({type: 'SET_COURSES', payload: {index:6, courses: await fetchOnDemandCourse()}})
       dispatch({type: 'SET_COURSES', payload: {index:1, courses: await fetchCourseByCategory(1)}})
       dispatch({type: 'SET_COURSES', payload: {index:2, courses: await fetchCourseByCategory(2)}})
       dispatch({type: 'SET_COURSES', payload: {index:3, courses: await fetchCourseByCategory(3)}})
       dispatch({type: 'SET_COURSES', payload: {index:4, courses: await fetchCourseByCategory(4)}})
       dispatch({type: 'SET_COURSES', payload: {index:5, courses: await fetchCourseByCategory(5)}})
-      dispatch({type: 'SET_COURSES', payload: {index:6, courses: await fetchOnDemandCourse()}})
-      dispatch({type: 'SET_LOAD', payload: true});
+      // dispatch({type: 'SET_LOAD', payload: true});
     };
     init();
-  },[]);
-
+  },[tokenSelector.token]);
+  
   return (
     <>
       <title>
@@ -143,7 +145,7 @@ export default function Courses() {
             </form>
           </div>
         </div>
-        {state.load &&
+        {/* {state.load && */}
           <div className="space-y-8">
             <CardCarousel title="Recommended For You" courses={state.recommendedCourses} />
             <CardCarousel title="Popular Courses" courses={state.onDemandCourses} />
@@ -152,7 +154,8 @@ export default function Courses() {
             <CardCarousel title="Software Development" courses={state.category5Courses} />
             <CardCarousel title="Security" courses={state.category2Courses} />
             <CardCarousel title="Others" courses={state.category4Courses} />
-          </div>}
+          </div>
+          {/* } */}
 
       </main>
     </>
